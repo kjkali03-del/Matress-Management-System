@@ -21,8 +21,17 @@ ENV APP_ENV=production \
     LOG_CHANNEL=stderr
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends nginx supervisor libicu-dev libpq-dev libzip-dev gettext-base \
-    && docker-php-ext-install bcmath intl mbstring opcache pdo_pgsql zip \
+    && apt-get install -y --no-install-recommends \
+        nginx \
+        supervisor \
+        gettext-base \
+        libicu-dev \
+        libonig-dev \
+        libpq-dev \
+        libzip-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install -j"$(nproc)" bcmath intl mbstring opcache pdo_pgsql zip \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
