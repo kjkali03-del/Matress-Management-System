@@ -17,9 +17,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 });
 
-Route::withoutMiddleware([ValidateCsrfToken::class])->prefix('webhooks/whatsapp')->group(function () {
-    Route::get('/', [WhatsAppWebhookController::class, 'verify'])->name('whatsapp.webhook.verify');
+Route::prefix('webhooks/whatsapp')->group(function () {
+    Route::get('/', [WhatsAppWebhookController::class, 'verify'])
+        ->withoutMiddleware([ValidateCsrfToken::class, 'auth', 'admin'])
+        ->name('whatsapp.webhook.verify');
     Route::post('/', [WhatsAppWebhookController::class, 'receive'])
+        ->withoutMiddleware([ValidateCsrfToken::class, 'auth', 'admin'])
         ->middleware('webhook.secret')
         ->name('whatsapp.webhook.receive');
 });

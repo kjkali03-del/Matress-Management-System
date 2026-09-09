@@ -16,11 +16,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $email = env('ADMIN_EMAIL');
+        $password = env('ADMIN_PASSWORD');
+
+        if (empty($email) || empty($password)) {
+            throw new \RuntimeException(
+                'ADMIN_EMAIL and ADMIN_PASSWORD must be configured before running the admin seeder.'
+            );
+        }
+
         User::updateOrCreate(
-            ['email' => 'marwalawrence20@gmail.com'],
+            ['email' => $email],
             [
                 'name' => 'Admin',
-                'password' => Hash::make('Lawren888'),
+                'password' => Hash::make($password),
                 'email_verified_at' => now(),
                 'is_admin' => true,
             ],
