@@ -69,6 +69,19 @@ Route::middleware('auth')->group(function () {
             Route::get('/inbox', [InboxController::class, 'index'])
                 ->name('inbox');
 
+            /*
+            | Fetch messages newer than a specific message ID
+            */
+
+            Route::get(
+                '/inbox/{conversation}/messages',
+                [InboxController::class, 'messages']
+            )->name('inbox.messages');
+
+            /*
+            | Send / save outbound message
+            */
+
             Route::post(
                 '/inbox/{conversation}/messages',
                 [InboxController::class, 'store']

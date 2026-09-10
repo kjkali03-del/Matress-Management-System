@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Services\ConversationMessageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -25,16 +26,45 @@ class InboxController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $selectedConversation = $conversations->firstWhere('id', (int) $request->integer('conversation'))
-            ?? $conversations->first();
+        $selectedConversation = $conversations->firstWhere(
+            'id',
+            (int) $request->integer('conversation')
+        ) ?? $conversations->first();
 
         if ($selectedConversation) {
-            $selectedConversation->load(['customer', 'messages' => function ($query) {
-                $query->orderBy('created_at')->orderBy('id');
-            }]);
+            $selectedConversation->load([
+                'customer',
+                'messages' => function ($query) {
+                    $query->orderBy('created_at')->orderBy('id');
+                },
+            ]);
         }
 
         return view('admin.inbox', compact('conversations', 'selectedConversation'));
+    }
+
+    public function messages(
+        Request $request,
+        Conversation $conversation
+    ): JsonResponse {
+        $afterId = $request->integer('after_id', 0);
+
+        $messages = $conversation->messages()
+            ->where('id', '>', $afterId)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get()
+            ->map(fn ($message) => [
+                'id' => $message->id,
+                'direction' => $message->direction,
+                'body' => $message->body,
+                'status' => $message->status,
+                'created_at' => $message->created_at?->toISOString(),
+            ]);
+
+        return response()->json([
+            'messages' => $messages,
+        ]);
     }
 
     public function store(Request $request, Conversation $conversation): RedirectResponse
@@ -45,7 +75,8 @@ class InboxController extends Controller
 
         $this->messageService->sendText($conversation, trim($validated['body']));
 
-        return redirect()->route('admin.inbox', ['conversation' => $conversation->id])
-            ->with('status', 'Message saved to the conversation.');
+        return redirect()->route('admin.inbox', [
+            'conversation' => $conversation->id,
+        ])->with('status', 'Message saved to the conversation.');
     }
 }
