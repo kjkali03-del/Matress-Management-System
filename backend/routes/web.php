@@ -1,10 +1,17 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\InboxController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return auth()->check()
@@ -12,31 +19,90 @@ Route::get('/', function () {
         : redirect()->route('login');
 });
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
-});
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
 
-Route::prefix('webhooks/whatsapp')->group(function () {
-    Route::get('/', [WhatsAppWebhookController::class, 'verify'])
-        ->withoutMiddleware([ValidateCsrfToken::class, 'auth', 'admin'])
-        ->name('whatsapp.webhook.verify');
-    Route::post('/', [WhatsAppWebhookController::class, 'receive'])
-        ->withoutMiddleware([ValidateCsrfToken::class, 'auth', 'admin'])
-        ->middleware('webhook.secret')
-        ->name('whatsapp.webhook.receive');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'create'])
+        ->name('login');
+
+    Route::post('/login', [LoginController::class, 'store'])
+        ->name('login.store');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    Route::middleware('admin')->prefix('admin')->group(function () {
-        Route::get('/', function () {
-            return view('admin');
-        })->name('admin');
+    Route::post('/logout', [LoginController::class, 'destroy'])
+        ->name('logout');
 
-        Route::get('/inbox', [InboxController::class, 'index'])->name('admin.inbox');
-        Route::post('/inbox/{conversation}/messages', [InboxController::class, 'store'])
-            ->name('admin.inbox.messages.store');
-    });
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware('admin')
+        ->get('/admin', function () {
+            return view('admin.dashboard');
+        })
+        ->name('admin');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Panel
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware(['admin'])
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+
+            /*
+            | Customer Inbox
+            */
+
+            Route::get('/inbox', [InboxController::class, 'index'])
+                ->name('inbox');
+
+            Route::post(
+                '/inbox/{conversation}/messages',
+                [InboxController::class, 'store']
+            )->name('inbox.messages.store');
+
+            /*
+            | Products
+            */
+
+            Route::resource('products', ProductController::class);
+        });
+});
+
+/*
+|--------------------------------------------------------------------------
+| WhatsApp Webhook
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('webhooks/whatsapp')->group(function () {
+
+    Route::get('/', [WhatsAppWebhookController::class, 'verify'])
+        ->withoutMiddleware([
+            ValidateCsrfToken::class,
+            'auth',
+            'admin',
+        ])
+        ->name('whatsapp.webhook.verify');
+
+    Route::post('/', [WhatsAppWebhookController::class, 'receive'])
+        ->withoutMiddleware([
+            ValidateCsrfToken::class,
+            'auth',
+            'admin',
+        ])
+        ->middleware('webhook.secret')
+        ->name('whatsapp.webhook.receive');
 });
