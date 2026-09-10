@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\InboxController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\WhatsAppWebhookController;
+use App\Http\Middleware\VerifyMetaWebhookSignature;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 
@@ -89,6 +90,10 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('webhooks/whatsapp')->group(function () {
 
+    /*
+    | Meta webhook verification
+    */
+
     Route::get('/', [WhatsAppWebhookController::class, 'verify'])
         ->withoutMiddleware([
             ValidateCsrfToken::class,
@@ -97,12 +102,16 @@ Route::prefix('webhooks/whatsapp')->group(function () {
         ])
         ->name('whatsapp.webhook.verify');
 
+    /*
+    | Meta webhook events
+    */
+
     Route::post('/', [WhatsAppWebhookController::class, 'receive'])
         ->withoutMiddleware([
             ValidateCsrfToken::class,
             'auth',
             'admin',
         ])
-        ->middleware('webhook.secret')
+        ->middleware(VerifyMetaWebhookSignature::class)
         ->name('whatsapp.webhook.receive');
 });

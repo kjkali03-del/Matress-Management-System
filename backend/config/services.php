@@ -9,8 +9,8 @@ return [
     |
     | This file is for storing the credentials for third party services such
     | as Resend, Postmark, AWS, and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
+    | location for this type of information, allowing packages to have a
+    | conventional file to locate the various service credentials.
     |
     */
 
@@ -40,9 +40,13 @@ return [
         'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
         'business_account_id' => env('WHATSAPP_BUSINESS_ACCOUNT_ID'),
         'verify_token' => env('WHATSAPP_VERIFY_TOKEN'),
+        'app_secret' => env('META_APP_SECRET'),
         'webhook_secret' => env('LARAVEL_WEBHOOK_SECRET'),
         'api_version' => env('WHATSAPP_API_VERSION', 'v21.0'),
-        'base_url' => env('WHATSAPP_API_BASE_URL', 'https://graph.facebook.com'),
+        'base_url' => env(
+            'WHATSAPP_API_BASE_URL',
+            'https://graph.facebook.com'
+        ),
     ],
 
 ];
