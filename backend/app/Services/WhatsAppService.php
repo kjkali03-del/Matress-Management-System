@@ -59,16 +59,12 @@ class WhatsAppService
 
    private function logFailure(Response $response): void
 {
-    $error = $response->json('error');
-
     Log::warning('WhatsApp API request failed.', [
         'status' => $response->status(),
-        'endpoint' => 'messages',
-        'error_type' => is_array($error) ? ($error['type'] ?? null) : null,
-        'error_code' => is_array($error) ? ($error['code'] ?? null) : null,
-        'error_subcode' => is_array($error) ? ($error['error_subcode'] ?? null) : null,
-        'error_message' => is_array($error) ? ($error['message'] ?? null) : null,
-        'fbtrace_id' => is_array($error) ? ($error['fbtrace_id'] ?? null) : null,
+        'url' => $response->effectiveUri(),
+        'content_type' => $response->header('Content-Type'),
+        'response_body' => $response->body(),
+        'fbtrace_id' => $response->header('x-fb-trace-id'),
     ]);
 }
 }
