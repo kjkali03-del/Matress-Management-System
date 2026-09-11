@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class IncomingWhatsAppMessageService
 {
     public function __construct(
-        private readonly AutomationService $automation,
+        private readonly AutomationService $automationService
     ) {}
 
     /** @return array{processed: int, duplicates: int} */
@@ -49,15 +49,15 @@ class IncomingWhatsAppMessageService
                         );
 
                         /*
-                         * Run automation only after the inbound message
-                         * has been successfully stored.
+                         * Run automations only after the inbound message
+                         * has been successfully committed to the database.
                          *
-                         * This keeps the external WhatsApp API call
-                         * outside the database transaction.
+                         * AutomationService handles its own failures so
+                         * an automation problem does not break webhook
+                         * processing.
                          */
-                        $this->automation->process(
-                            $message->conversation,
-                            $message,
+                        $this->automationService->handleIncomingMessage(
+                            $message
                         );
 
                         $processed++;
@@ -101,56 +101,57 @@ class IncomingWhatsAppMessageService
         array $incoming,
         array $contacts
     ): Message {
-        return DB::transaction(
-            function () use ($incoming, $contacts): Message {
-                $phone = (string) ($incoming['from'] ?? '');
+        return DB::transaction(function () use (
+            $incoming,
+            $contacts
+        ): Message {
+            $phone = (string) ($incoming['from'] ?? '');
 
-                $contact = collect($contacts)->firstWhere(
-                    'wa_id',
-                    $phone
-                ) ?? [];
+            $contact = collect($contacts)->firstWhere(
+                'wa_id',
+                $phone
+            ) ?? [];
 
-                $customer = Customer::firstOrCreate(
-                    [
-                        'provider' => 'whatsapp',
-                        'provider_customer_id' => $phone,
-                    ],
-                    [
-                        'name' => data_get(
-                            $contact,
-                            'profile.name',
-                            $phone
-                        ),
-                        'phone' => $phone,
-                    ],
-                );
+            $customer = Customer::firstOrCreate(
+                [
+                    'provider' => 'whatsapp',
+                    'provider_customer_id' => $phone,
+                ],
+                [
+                    'name' => data_get(
+                        $contact,
+                        'profile.name',
+                        $phone
+                    ),
+                    'phone' => $phone,
+                ],
+            );
 
-                $conversation = Conversation::firstOrCreate(
-                    [
-                        'customer_id' => $customer->id,
-                        'channel' => 'whatsapp',
-                        'status' => 'open',
-                    ],
-                );
+            $conversation = Conversation::firstOrCreate(
+                [
+                    'customer_id' => $customer->id,
+                    'channel' => 'whatsapp',
+                    'status' => 'open',
+                ],
+            );
 
-                $createdAt = now();
+            $createdAt = now();
 
-                $message = $conversation->messages()->create([
-                    'direction' => 'inbound',
-                    'message_type' => 'text',
-                    'body' => data_get($incoming, 'text.body'),
-                    'provider_message_id' => $incoming['id'],
-                    'status' => 'delivered',
-                    'sent_at' => $createdAt,
-                ]);
+            $message = $conversation->messages()->create([
+                'direction' => 'inbound',
+                'message_type' => 'text',
+                'body' => data_get($incoming, 'text.body'),
+                'provider_message_id' => $incoming['id'],
+                'status' => 'delivered',
+                'sent_at' => $createdAt,
+            ]);
 
-                $conversation->update([
-                    'last_message_at' => $createdAt,
-                ]);
+            $conversation->update([
+                'last_message_at' => $createdAt,
+            ]);
 
-                return $message;
-            }
-        );
+            return $message;
+        });
     }
 
     private function storeCall(

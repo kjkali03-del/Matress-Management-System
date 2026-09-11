@@ -3,85 +3,83 @@
 namespace App\Services;
 
 use App\Models\Automation;
-use App\Models\Conversation;
 use App\Models\Message;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class AutomationService
 {
     public function __construct(
-        private readonly ConversationMessageService $conversationMessages,
+        private readonly ConversationMessageService $conversationMessageService
     ) {}
 
     /**
-     * Evaluate active automations for an incoming customer message.
-     *
-     * @return array{
-     *     matched: int,
-     *     executed: int
-     * }
+     * Run active automations for an incoming message.
      */
-    public function process(
-        Conversation $conversation,
-        Message $message
-    ): array {
+    public function handleIncomingMessage(Message $message): void
+    {
         if (
             $message->direction !== 'inbound'
             || $message->message_type !== 'text'
             || blank($message->body)
         ) {
-            return [
-                'matched' => 0,
-                'executed' => 0,
-            ];
+            return;
         }
+
+        $message->loadMissing('conversation');
 
         $automations = Automation::query()
             ->where('is_active', true)
             ->where('trigger', 'message_received')
+            ->latest('id')
             ->get();
 
-        $matched = 0;
-        $executed = 0;
-
         foreach ($automations as $automation) {
-            if (! $this->matchesConditions($automation, $message)) {
+            if (! $this->conditionsMatch($automation, (string) $message->body)) {
                 continue;
             }
 
-            $matched++;
+            try {
+                $executed = $this->executeActions(
+                    $automation,
+                    $message
+                );
 
-            if ($this->executeActions($automation, $conversation)) {
-                $executed++;
+                if ($executed) {
+                    /*
+                     * For now, stop after the first matching automation.
+                     * This prevents multiple automations from sending
+                     * several replies to the same customer.
+                     */
+                    break;
+                }
+            } catch (\Throwable $exception) {
+                Log::error('Automation execution failed.', [
+                    'automation_id' => $automation->id,
+                    'message_id' => $message->id,
+                    'exception' => $exception,
+                ]);
             }
         }
-
-        return [
-            'matched' => $matched,
-            'executed' => $executed,
-        ];
     }
 
-    private function matchesConditions(
+    /**
+     * Check whether the automation conditions match the message.
+     */
+    private function conditionsMatch(
         Automation $automation,
-        Message $message
+        string $messageBody
     ): bool {
-        $conditions = $automation->conditions;
+        $conditions = $automation->conditions ?? [];
 
-        if (! is_array($conditions) || $conditions === []) {
+        if ($conditions === []) {
             return true;
         }
 
         foreach ($conditions as $condition) {
-            if (! is_array($condition)) {
-                continue;
-            }
-
-            $type = (string) ($condition['type'] ?? '');
+            $type = $condition['type'] ?? null;
 
             if ($type !== 'keyword') {
-                continue;
+                return false;
             }
 
             $keyword = trim((string) ($condition['value'] ?? ''));
@@ -90,10 +88,7 @@ class AutomationService
                 return false;
             }
 
-            if (! $this->containsKeyword(
-                (string) $message->body,
-                $keyword
-            )) {
+            if (! $this->containsKeyword($messageBody, $keyword)) {
                 return false;
             }
         }
@@ -101,34 +96,42 @@ class AutomationService
         return true;
     }
 
+    /**
+     * Case-insensitive keyword matching.
+     */
     private function containsKeyword(
-        string $message,
+        string $messageBody,
         string $keyword
     ): bool {
-        return Str::contains(
-            Str::lower($message),
-            Str::lower($keyword)
+        return str_contains(
+            mb_strtolower($messageBody),
+            mb_strtolower($keyword)
         );
     }
 
+    /**
+     * Execute the configured automation actions.
+     */
     private function executeActions(
         Automation $automation,
-        Conversation $conversation
+        Message $message
     ): bool {
-        $actions = $automation->actions;
+        $actions = $automation->actions ?? [];
 
-        if (! is_array($actions) || $actions === []) {
+        if ($actions === []) {
+            return false;
+        }
+
+        $conversation = $message->conversation;
+
+        if (! $conversation) {
             return false;
         }
 
         $executed = false;
 
         foreach ($actions as $action) {
-            if (! is_array($action)) {
-                continue;
-            }
-
-            $type = (string) ($action['type'] ?? '');
+            $type = $action['type'] ?? null;
 
             if ($type === 'send_text') {
                 $body = trim((string) ($action['message'] ?? ''));
@@ -137,9 +140,9 @@ class AutomationService
                     continue;
                 }
 
-                $this->conversationMessages->sendText(
+                $this->conversationMessageService->sendText(
                     $conversation,
-                    $body,
+                    $body
                 );
 
                 $executed = true;

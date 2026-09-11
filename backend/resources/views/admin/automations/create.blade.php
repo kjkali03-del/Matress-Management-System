@@ -8,9 +8,7 @@
     <div>
         <p class="auth-kicker">Wonder Godoro Point</p>
 
-        <h1>
-            Create Automation
-        </h1>
+        <h1>Create Automation</h1>
     </div>
 
     <span class="dashboard-date">
@@ -24,7 +22,6 @@
 >
 
     <div class="automation-builder-intro">
-
         <div>
             <p class="dashboard-section-kicker">
                 Automation builder
@@ -35,8 +32,8 @@
             </h2>
 
             <p>
-                Tell the system what should start the automation,
-                what it should look for, and how it should respond.
+                Choose what starts the automation, define when it should
+                respond, and decide what Wonder Godoro Point should do.
             </p>
         </div>
 
@@ -46,7 +43,6 @@
         >
             &larr; Back to Automations
         </a>
-
     </div>
 
     @if ($errors->any())
@@ -70,6 +66,7 @@
         method="POST"
         action="{{ route('admin.automations.store') }}"
         class="automation-builder-form"
+        id="automation-form"
     >
         @csrf
 
@@ -78,7 +75,6 @@
         <section class="automation-builder-card">
 
             <div class="automation-builder-card-heading">
-
                 <div class="automation-step-number">
                     01
                 </div>
@@ -93,11 +89,10 @@
                     </h3>
 
                     <p>
-                        Use a name that makes the purpose of this rule
-                        immediately clear to your team.
+                        Use a clear name so your team immediately knows
+                        what this automation does.
                     </p>
                 </div>
-
             </div>
 
             <div class="automation-field-grid">
@@ -113,7 +108,7 @@
                         type="text"
                         name="name"
                         value="{{ old('name') }}"
-                        placeholder="Example: Auto reply for price enquiries"
+                        placeholder="Example: Welcome New Customers"
                         maxlength="255"
                         required
                     >
@@ -131,7 +126,7 @@
                         id="description"
                         name="description"
                         rows="3"
-                        placeholder="Example: Automatically responds when a customer asks about mattress prices."
+                        placeholder="Example: Welcomes a customer automatically when they contact us for the first time."
                     >{{ old('description') }}</textarea>
 
                 </div>
@@ -139,6 +134,7 @@
             </div>
 
         </section>
+
 
         {{-- TRIGGER --}}
 
@@ -151,6 +147,7 @@
                 </div>
 
                 <div>
+
                     <p class="automation-builder-kicker">
                         WHEN
                     </p>
@@ -160,51 +157,169 @@
                     </h3>
 
                     <p>
-                        Choose the customer event that activates this rule.
+                        Select the event that should activate this rule.
                     </p>
+
                 </div>
 
             </div>
 
-            <div class="automation-flow-box">
+            <div class="automation-trigger-grid">
 
-                <div class="automation-flow-icon">
-                    WHEN
-                </div>
+                <label class="automation-trigger-option">
 
-                <div class="automation-field automation-field--flow">
-
-                    <label for="trigger">
-                        Customer event
-                    </label>
-
-                    <select
-                        id="trigger"
+                    <input
+                        type="radio"
                         name="trigger"
-                        required
+                        value="new_customer"
+                        {{ old('trigger') === 'new_customer' ? 'checked' : '' }}
                     >
-                        <option
-                            value="message_received"
-                            {{ old('trigger', 'message_received') === 'message_received' ? 'selected' : '' }}
-                        >
-                            Customer sends a message
-                        </option>
-                    </select>
 
-                    <small>
-                        The automation will be evaluated when a new
-                        customer message is received.
-                    </small>
+                    <span class="automation-trigger-card">
 
-                </div>
+                        <span class="automation-trigger-icon">
+                            &#128075;
+                        </span>
+
+                        <span class="automation-trigger-content">
+
+                            <strong>
+                                New Customer
+                            </strong>
+
+                            <small>
+                                First message from a new customer.
+                            </small>
+
+                        </span>
+
+                        <span class="automation-trigger-check">
+                            &#10003;
+                        </span>
+
+                    </span>
+
+                </label>
+
+
+                <label class="automation-trigger-option">
+
+                    <input
+                        type="radio"
+                        name="trigger"
+                        value="message_received"
+                        {{ old('trigger', 'message_received') === 'message_received' ? 'checked' : '' }}
+                    >
+
+                    <span class="automation-trigger-card">
+
+                        <span class="automation-trigger-icon">
+                            &#128172;
+                        </span>
+
+                        <span class="automation-trigger-content">
+
+                            <strong>
+                                Message Received
+                            </strong>
+
+                            <small>
+                                Run when a customer sends a message.
+                            </small>
+
+                        </span>
+
+                        <span class="automation-trigger-check">
+                            &#10003;
+                        </span>
+
+                    </span>
+
+                </label>
+
+
+                <label class="automation-trigger-option">
+
+                    <input
+                        type="radio"
+                        name="trigger"
+                        value="keyword"
+                        {{ old('trigger') === 'keyword' ? 'checked' : '' }}
+                    >
+
+                    <span class="automation-trigger-card">
+
+                        <span class="automation-trigger-icon">
+                            &#128273;
+                        </span>
+
+                        <span class="automation-trigger-content">
+
+                            <strong>
+                                Keyword Match
+                            </strong>
+
+                            <small>
+                                Run when a message contains a keyword.
+                            </small>
+
+                        </span>
+
+                        <span class="automation-trigger-check">
+                            &#10003;
+                        </span>
+
+                    </span>
+
+                </label>
+
+
+                <label class="automation-trigger-option">
+
+                    <input
+                        type="radio"
+                        name="trigger"
+                        value="no_reply"
+                        {{ old('trigger') === 'no_reply' ? 'checked' : '' }}
+                    >
+
+                    <span class="automation-trigger-card">
+
+                        <span class="automation-trigger-icon">
+                            &#9201;
+                        </span>
+
+                        <span class="automation-trigger-content">
+
+                            <strong>
+                                No Reply / Follow-up
+                            </strong>
+
+                            <small>
+                                Follow up when a customer does not reply.
+                            </small>
+
+                        </span>
+
+                        <span class="automation-trigger-check">
+                            &#10003;
+                        </span>
+
+                    </span>
+
+                </label>
 
             </div>
 
         </section>
 
-        {{-- CONDITION --}}
 
-        <section class="automation-builder-card">
+        {{-- CONDITIONS --}}
+
+        <section
+            class="automation-builder-card"
+            id="conditions-section"
+        >
 
             <div class="automation-builder-card-heading">
 
@@ -213,6 +328,7 @@
                 </div>
 
                 <div>
+
                     <p class="automation-builder-kicker">
                         IF
                     </p>
@@ -221,15 +337,20 @@
                         When should the rule respond?
                     </h3>
 
-                    <p>
-                        Start with a keyword condition. We can add more
-                        condition types later.
+                    <p id="condition-description">
+                        Add conditions when this automation needs to
+                        look for something specific.
                     </p>
+
                 </div>
 
             </div>
 
-            <div class="automation-rule-box">
+
+            <div
+                class="automation-rule-box"
+                id="keyword-condition"
+            >
 
                 <div class="automation-rule-label">
                     IF
@@ -245,17 +366,20 @@
                         id="condition_type"
                         name="conditions[0][type]"
                     >
+
                         <option value="keyword">
                             Message contains keyword
                         </option>
+
                     </select>
 
                 </div>
 
+
                 <div class="automation-field">
 
                     <label for="condition_value">
-                        Keyword
+                        Keyword / phrase
                     </label>
 
                     <input
@@ -267,14 +391,126 @@
                     >
 
                     <small>
-                        Enter one keyword or phrase for this first rule.
+                        Example: bei, godoro, delivery, size
                     </small>
 
                 </div>
 
             </div>
 
+
+            <div
+                class="automation-special-info"
+                id="welcome-condition"
+            >
+
+                <span class="automation-special-icon">
+                    &#128075;
+                </span>
+
+                <div>
+
+                    <strong>
+                        Welcome automation
+                    </strong>
+
+                    <p>
+                        This automation is designed for the customer's
+                        first message. No keyword is required.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="automation-followup-box"
+                id="followup-condition"
+            >
+
+                <div class="automation-followup-heading">
+
+                    <span class="automation-special-icon">
+                        &#9201;
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Follow-up timing
+                        </strong>
+
+                        <p>
+                            Choose how long the system should wait before
+                            sending the follow-up.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="automation-field-grid">
+
+                    <div class="automation-field">
+
+                        <label for="delay_value">
+                            Wait for
+                        </label>
+
+                        <input
+                            id="delay_value"
+                            type="number"
+                            name="conditions[0][delay_value]"
+                            value="{{ old('conditions.0.delay_value', 24) }}"
+                            min="1"
+                            max="720"
+                        >
+
+                    </div>
+
+                    <div class="automation-field">
+
+                        <label for="delay_unit">
+                            Unit
+                        </label>
+
+                        <select
+                            id="delay_unit"
+                            name="conditions[0][delay_unit]"
+                        >
+
+                            <option
+                                value="minutes"
+                                {{ old('conditions.0.delay_unit') === 'minutes' ? 'selected' : '' }}
+                            >
+                                Minutes
+                            </option>
+
+                            <option
+                                value="hours"
+                                {{ old('conditions.0.delay_unit', 'hours') === 'hours' ? 'selected' : '' }}
+                            >
+                                Hours
+                            </option>
+
+                            <option
+                                value="days"
+                                {{ old('conditions.0.delay_unit') === 'days' ? 'selected' : '' }}
+                            >
+                                Days
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </section>
+
 
         {{-- ACTION --}}
 
@@ -287,6 +523,7 @@
                 </div>
 
                 <div>
+
                     <p class="automation-builder-kicker">
                         THEN
                     </p>
@@ -298,11 +535,13 @@
                     <p>
                         Define the automatic response sent to the customer.
                     </p>
+
                 </div>
 
             </div>
 
-            <div class="automation-rule-box automation-rule-box--action">
+
+            <div class="automation-action-box">
 
                 <div class="automation-rule-label">
                     THEN
@@ -318,36 +557,65 @@
                         id="action_type"
                         name="actions[0][type]"
                     >
+
                         <option value="send_text">
                             Send text message
                         </option>
+
                     </select>
-
-                </div>
-
-                <div class="automation-field automation-field--full">
-
-                    <label for="action_message">
-                        Automatic reply
-                    </label>
-
-                    <textarea
-                        id="action_message"
-                        name="actions[0][message]"
-                        rows="6"
-                        placeholder="Example: Karibu Wonder Godoro Point. Bei za magodoro zinaanzia Tsh 165,000. Tunatoa delivery bure ndani ya Dar es Salaam."
-                    >{{ old('actions.0.message') }}</textarea>
-
-                    <small>
-                        This message will be sent automatically when the
-                        trigger and condition are matched.
-                    </small>
 
                 </div>
 
             </div>
 
+
+            <div class="automation-field automation-field--full">
+
+                <label for="action_message">
+                    Automatic message
+                </label>
+
+                <textarea
+                    id="action_message"
+                    name="actions[0][message]"
+                    rows="7"
+                    placeholder="Example: Habari 👋 Karibu Wonder Godoro Point! Tunafurahi kukuhudumia. Unahitaji godoro la size gani?"
+                    required
+                >{{ old('actions.0.message') }}</textarea>
+
+                <small>
+                    This message will be sent automatically when the
+                    automation is triggered.
+                </small>
+
+            </div>
+
+
+            <div class="automation-message-preview">
+
+                <div class="automation-message-preview-header">
+
+                    <span>
+                        Message preview
+                    </span>
+
+                    <span>
+                        WhatsApp
+                    </span>
+
+                </div>
+
+                <div
+                    class="automation-message-bubble"
+                    id="message-preview"
+                >
+                    Your automatic message will appear here.
+                </div>
+
+            </div>
+
         </section>
+
 
         {{-- STATUS --}}
 
@@ -360,6 +628,7 @@
                 </div>
 
                 <div>
+
                     <p class="automation-builder-kicker">
                         STATUS
                     </p>
@@ -371,9 +640,11 @@
                     <p>
                         You can disable the rule later without deleting it.
                     </p>
+
                 </div>
 
             </div>
+
 
             <label class="automation-toggle">
 
@@ -404,6 +675,7 @@
 
         </section>
 
+
         {{-- ACTION BAR --}}
 
         <div class="automation-builder-actions">
@@ -429,7 +701,9 @@
 
 </section>
 
+
 <style>
+
     .automation-builder {
         width: 100%;
         max-width: 1100px;
@@ -596,10 +870,103 @@
         opacity: 0.5;
     }
 
-    .automation-flow-box,
+
+    /* TRIGGER OPTIONS */
+
+    .automation-trigger-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+    }
+
+    .automation-trigger-option {
+        position: relative;
+        display: block;
+        cursor: pointer;
+    }
+
+    .automation-trigger-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .automation-trigger-card {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-height: 86px;
+        padding: 17px;
+        border: 1px solid rgba(185, 145, 65, 0.16);
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.08);
+        transition:
+            border-color 0.2s ease,
+            background 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .automation-trigger-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(185, 145, 65, 0.4);
+    }
+
+    .automation-trigger-option input:checked
+        + .automation-trigger-card {
+        border-color: rgba(185, 145, 65, 0.7);
+        background: rgba(185, 145, 65, 0.09);
+    }
+
+    .automation-trigger-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        border: 1px solid rgba(185, 145, 65, 0.25);
+        border-radius: 12px;
+        font-size: 19px;
+    }
+
+    .automation-trigger-content {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .automation-trigger-content strong {
+        font-size: 13px;
+    }
+
+    .automation-trigger-content small {
+        font-size: 11px;
+        line-height: 1.5;
+        opacity: 0.55;
+    }
+
+    .automation-trigger-check {
+        margin-left: auto;
+        opacity: 0;
+        font-size: 14px;
+        font-weight: 800;
+        transition: opacity 0.2s ease;
+    }
+
+    .automation-trigger-option input:checked
+        + .automation-trigger-card
+        .automation-trigger-check {
+        opacity: 1;
+    }
+
+
+    /* CONDITIONS */
+
     .automation-rule-box {
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-columns: auto repeat(2, minmax(0, 1fr));
         gap: 20px;
         align-items: start;
         padding: 22px;
@@ -608,16 +975,7 @@
         background: rgba(0, 0, 0, 0.08);
     }
 
-    .automation-rule-box {
-        grid-template-columns: auto repeat(2, minmax(0, 1fr));
-    }
-
-    .automation-rule-box--action {
-        grid-template-columns: auto minmax(0, 0.7fr) minmax(0, 1.3fr);
-    }
-
-    .automation-rule-label,
-    .automation-flow-icon {
+    .automation-rule-label {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -631,24 +989,108 @@
         letter-spacing: 0.12em;
     }
 
-    .automation-flow-icon {
-        align-self: center;
+    .automation-special-info,
+    .automation-followup-box {
+        display: none;
     }
 
-    .automation-form-alert {
+    .automation-special-info {
+        align-items: flex-start;
+        gap: 15px;
+        padding: 20px;
+        border: 1px solid rgba(185, 145, 65, 0.18);
+        border-radius: 16px;
+        background: rgba(185, 145, 65, 0.05);
+    }
+
+    .automation-special-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 40px;
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        border: 1px solid rgba(185, 145, 65, 0.25);
+        font-size: 18px;
+    }
+
+    .automation-special-info strong,
+    .automation-followup-heading strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px;
+    }
+
+    .automation-special-info p,
+    .automation-followup-heading p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.6;
+        opacity: 0.6;
+    }
+
+    .automation-followup-box {
+        padding: 20px;
+        border: 1px solid rgba(185, 145, 65, 0.18);
+        border-radius: 16px;
+        background: rgba(185, 145, 65, 0.04);
+    }
+
+    .automation-followup-heading {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
         margin-bottom: 20px;
-        padding: 16px 18px;
-        border: 1px solid rgba(190, 70, 70, 0.35);
-        border-radius: 14px;
-        background: rgba(190, 70, 70, 0.07);
+    }
+
+
+    /* ACTION */
+
+    .automation-action-box {
+        display: grid;
+        grid-template-columns: auto minmax(0, 0.7fr);
+        gap: 20px;
+        align-items: start;
+        margin-bottom: 20px;
+        padding: 22px;
+        border: 1px solid rgba(185, 145, 65, 0.14);
+        border-radius: 18px;
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    .automation-message-preview {
+        margin-top: 25px;
+        padding: 18px;
+        border: 1px solid rgba(185, 145, 65, 0.12);
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .automation-message-preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0.5;
+    }
+
+    .automation-message-bubble {
+        max-width: 75%;
+        padding: 13px 15px;
+        border-radius: 14px 14px 14px 3px;
+        background: rgba(185, 145, 65, 0.1);
         font-size: 13px;
         line-height: 1.6;
+        white-space: pre-wrap;
     }
 
-    .automation-form-alert ul {
-        margin: 8px 0 0;
-        padding-left: 20px;
-    }
+
+    /* STATUS */
 
     .automation-toggle {
         display: flex;
@@ -685,11 +1127,13 @@
         transition: transform 0.2s ease;
     }
 
-    .automation-toggle input:checked + .automation-toggle-track {
+    .automation-toggle input:checked
+        + .automation-toggle-track {
         background: rgba(185, 145, 65, 0.75);
     }
 
-    .automation-toggle input:checked + .automation-toggle-track
+    .automation-toggle input:checked
+        + .automation-toggle-track
         .automation-toggle-thumb {
         transform: translateX(20px);
     }
@@ -708,6 +1152,27 @@
         font-size: 11px;
         opacity: 0.55;
     }
+
+
+    /* FORM ALERT */
+
+    .automation-form-alert {
+        margin-bottom: 20px;
+        padding: 16px 18px;
+        border: 1px solid rgba(190, 70, 70, 0.35);
+        border-radius: 14px;
+        background: rgba(190, 70, 70, 0.07);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .automation-form-alert ul {
+        margin: 8px 0 0;
+        padding-left: 20px;
+    }
+
+
+    /* BUTTONS */
 
     .automation-builder-actions {
         display: flex;
@@ -756,6 +1221,9 @@
         background: rgba(185, 145, 65, 0.08);
     }
 
+
+    /* RESPONSIVE */
+
     @media (max-width: 820px) {
 
         .automation-builder-intro {
@@ -763,12 +1231,13 @@
             flex-direction: column;
         }
 
-        .automation-field-grid {
+        .automation-field-grid,
+        .automation-trigger-grid {
             grid-template-columns: 1fr;
         }
 
         .automation-rule-box,
-        .automation-rule-box--action {
+        .automation-action-box {
             grid-template-columns: 1fr;
         }
 
@@ -776,6 +1245,9 @@
             width: fit-content;
         }
 
+        .automation-message-bubble {
+            max-width: 90%;
+        }
     }
 
     @media (max-width: 560px) {
@@ -799,9 +1271,8 @@
             height: 40px;
         }
 
-        .automation-flow-box,
-        .automation-rule-box {
-            padding: 16px;
+        .automation-trigger-card {
+            min-height: 76px;
         }
 
         .automation-builder-actions {
@@ -813,8 +1284,127 @@
         .automation-secondary-button {
             width: 100%;
         }
-
     }
+
 </style>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const triggerInputs = document.querySelectorAll(
+            'input[name="trigger"]'
+        );
+
+        const keywordCondition =
+            document.getElementById('keyword-condition');
+
+        const welcomeCondition =
+            document.getElementById('welcome-condition');
+
+        const followupCondition =
+            document.getElementById('followup-condition');
+
+        const conditionDescription =
+            document.getElementById('condition-description');
+
+        const conditionValue =
+            document.getElementById('condition_value');
+
+        const actionMessage =
+            document.getElementById('action_message');
+
+        const messagePreview =
+            document.getElementById('message-preview');
+
+
+        function updateTriggerInterface() {
+
+            const selectedTrigger =
+                document.querySelector(
+                    'input[name="trigger"]:checked'
+                )?.value;
+
+
+            keywordCondition.style.display = 'none';
+            welcomeCondition.style.display = 'none';
+            followupCondition.style.display = 'none';
+
+
+            if (selectedTrigger === 'new_customer') {
+
+                welcomeCondition.style.display = 'flex';
+
+                conditionDescription.textContent =
+                    'This automation runs when a customer contacts Wonder Godoro Point for the first time.';
+
+                conditionValue.removeAttribute('required');
+
+            } else if (selectedTrigger === 'keyword') {
+
+                keywordCondition.style.display = 'grid';
+
+                conditionDescription.textContent =
+                    'The automation will respond when the customer message contains the keyword or phrase you specify.';
+
+                conditionValue.setAttribute('required', 'required');
+
+            } else if (selectedTrigger === 'no_reply') {
+
+                followupCondition.style.display = 'block';
+
+                conditionDescription.textContent =
+                    'The system will wait for the selected period before sending a follow-up when the customer has not replied.';
+
+                conditionValue.removeAttribute('required');
+
+            } else {
+
+                keywordCondition.style.display = 'grid';
+
+                conditionDescription.textContent =
+                    'You can optionally use a keyword or phrase to control when this automation responds.';
+
+                conditionValue.removeAttribute('required');
+            }
+
+        }
+
+
+        function updateMessagePreview() {
+
+            const message =
+                actionMessage.value.trim();
+
+            messagePreview.textContent =
+                message !== ''
+                    ? message
+                    : 'Your automatic message will appear here.';
+        }
+
+
+        triggerInputs.forEach(function (input) {
+
+            input.addEventListener(
+                'change',
+                updateTriggerInterface
+            );
+
+        });
+
+
+        actionMessage.addEventListener(
+            'input',
+            updateMessagePreview
+        );
+
+
+        updateTriggerInterface();
+        updateMessagePreview();
+
+    });
+
+</script>
 
 @endsection

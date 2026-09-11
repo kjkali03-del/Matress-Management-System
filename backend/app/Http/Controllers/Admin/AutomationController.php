@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Automation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AutomationController extends Controller
@@ -26,16 +28,7 @@ class AutomationController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'trigger' => ['required', 'string', 'max:50'],
-            'conditions' => ['nullable', 'array'],
-            'actions' => ['nullable', 'array'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
-
-        $validated['is_active'] = $request->boolean('is_active');
+        $validated = $this->validateAutomation($request);
 
         Automation::create($validated);
 
@@ -53,16 +46,7 @@ class AutomationController extends Controller
         Request $request,
         Automation $automation
     ): RedirectResponse {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'trigger' => ['required', 'string', 'max:50'],
-            'conditions' => ['nullable', 'array'],
-            'actions' => ['nullable', 'array'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
-
-        $validated['is_active'] = $request->boolean('is_active');
+        $validated = $this->validateAutomation($request);
 
         $automation->update($validated);
 
@@ -89,5 +73,170 @@ class AutomationController extends Controller
         return redirect()
             ->route('admin.automations.index')
             ->with('success', 'Automation status updated.');
+    }
+
+    /**
+     * Validate and normalize automation data.
+     *
+     * @return array<string, mixed>
+     */
+    private function validateAutomation(
+        Request $request
+    ): array {
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'description' => [
+                'nullable',
+                'string',
+            ],
+
+            'trigger' => [
+                'required',
+                'string',
+                Rule::in([
+                    'new_customer',
+                    'message_received',
+                    'keyword',
+                    'no_reply',
+                ]),
+            ],
+
+            'conditions' => [
+                'nullable',
+                'array',
+            ],
+
+            'conditions.0.value' => [
+                Rule::requiredIf(
+                    fn () => $request->input('trigger') === 'keyword'
+                ),
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'conditions.0.delay_value' => [
+                Rule::requiredIf(
+                    fn () => $request->input('trigger') === 'no_reply'
+                ),
+                'nullable',
+                'integer',
+                'min:1',
+                'max:720',
+            ],
+
+            'conditions.0.delay_unit' => [
+                Rule::requiredIf(
+                    fn () => $request->input('trigger') === 'no_reply'
+                ),
+                'nullable',
+                Rule::in([
+                    'minutes',
+                    'hours',
+                    'days',
+                ]),
+            ],
+
+            'actions' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'actions.0.type' => [
+                'required',
+                'string',
+                Rule::in([
+                    'send_text',
+                ]),
+            ],
+
+            'actions.0.message' => [
+                'required',
+                'string',
+                'max:4096',
+            ],
+
+            'is_active' => [
+                'nullable',
+                'boolean',
+            ],
+        ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
+
+        $validated['conditions'] = $this->normalizeConditions(
+            $validated['trigger'],
+            $validated['conditions'] ?? []
+        );
+
+        return $validated;
+    }
+
+    /**
+     * Keep conditions consistent with the selected trigger.
+     *
+     * @param array<int|string, mixed> $conditions
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeConditions(
+        string $trigger,
+        array $conditions
+    ): array {
+        $first = $conditions[0] ?? [];
+
+        if (! is_array($first)) {
+            $first = [];
+        }
+
+        return match ($trigger) {
+            'new_customer' => [],
+
+            'message_received' => $this->normalizeKeywordCondition(
+                $first
+            ),
+
+            'keyword' => $this->normalizeKeywordCondition(
+                $first
+            ),
+
+            'no_reply' => [[
+                'type' => 'delay',
+                'delay_value' => (int) ($first['delay_value'] ?? 0),
+                'delay_unit' => (string) (
+                    $first['delay_unit'] ?? 'minutes'
+                ),
+            ]],
+
+            default => [],
+        };
+    }
+
+    /**
+     * Normalize an optional keyword condition.
+     *
+     * @param array<string, mixed> $condition
+     * @return array<int, array<string, string>>
+     */
+    private function normalizeKeywordCondition(
+        array $condition
+    ): array {
+        $value = trim(
+            (string) ($condition['value'] ?? '')
+        );
+
+        if ($value === '') {
+            return [];
+        }
+
+        return [[
+            'type' => 'keyword',
+            'value' => $value,
+        ]];
     }
 }
