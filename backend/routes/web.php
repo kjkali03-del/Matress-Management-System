@@ -8,23 +8,11 @@ use App\Http\Middleware\VerifyMetaWebhookSignature;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
-
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('admin')
         : redirect()->route('login');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Authentication
-|--------------------------------------------------------------------------
-*/
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])
@@ -39,74 +27,45 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])
         ->name('logout');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Dashboard
-    |--------------------------------------------------------------------------
-    */
-
     Route::middleware('admin')
         ->get('/admin', function () {
             return view('admin.dashboard');
         })
         ->name('admin');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Panel
-    |--------------------------------------------------------------------------
-    */
-
     Route::middleware(['admin'])
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
 
-            /*
-            | Customer Inbox
-            */
-
             Route::get('/inbox', [InboxController::class, 'index'])
                 ->name('inbox');
-
-            /*
-            | Fetch messages newer than a specific message ID
-            */
 
             Route::get(
                 '/inbox/{conversation}/messages',
                 [InboxController::class, 'messages']
             )->name('inbox.messages');
 
-            /*
-            | Send / save outbound message
-            */
-
             Route::post(
                 '/inbox/{conversation}/messages',
                 [InboxController::class, 'store']
             )->name('inbox.messages.store');
 
-            /*
-            | Products
-            */
+            Route::patch(
+                '/inbox/customers/{customer}/notes',
+                [InboxController::class, 'updateCustomerNotes']
+            )->name('inbox.customers.notes.update');
+
+            Route::get(
+                '/inbox/customers/{customer}/notes/download',
+                [InboxController::class, 'downloadCustomerNotes']
+            )->name('inbox.customers.notes.download');
 
             Route::resource('products', ProductController::class);
         });
 });
 
-/*
-|--------------------------------------------------------------------------
-| WhatsApp Webhook
-|--------------------------------------------------------------------------
-*/
-
 Route::prefix('webhooks/whatsapp')->group(function () {
-
-    /*
-    | Meta webhook verification
-    */
-
     Route::get('/', [WhatsAppWebhookController::class, 'verify'])
         ->withoutMiddleware([
             ValidateCsrfToken::class,
@@ -114,10 +73,6 @@ Route::prefix('webhooks/whatsapp')->group(function () {
             'admin',
         ])
         ->name('whatsapp.webhook.verify');
-
-    /*
-    | Meta webhook events
-    */
 
     Route::post('/', [WhatsAppWebhookController::class, 'receive'])
         ->withoutMiddleware([

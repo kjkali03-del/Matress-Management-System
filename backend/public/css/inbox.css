@@ -5,7 +5,21 @@
     --inbox-ink: #26221c;
     --inbox-muted: #80776b;
     --inbox-accent: #bd6b1b;
+    --inbox-accent-dark: #9f5314;
     --inbox-inbound: #f0e9dc;
+    --inbox-selected: #fbf5ec;
+    --inbox-composer: #fbf8f2;
+    --inbox-success: #467145;
+    --inbox-danger: #a33b2d;
+    --inbox-white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
 }
 
 body.inbox-page {
@@ -16,13 +30,41 @@ body.inbox-page {
     min-height: 100vh;
 }
 
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .inbox-header {
     align-items: center;
     background: var(--inbox-surface);
     border-bottom: 1px solid var(--inbox-line);
     display: flex;
     justify-content: space-between;
+    min-height: 4.75rem;
     padding: 1rem clamp(1rem, 4vw, 4rem);
+}
+
+.admin-brand {
+    align-items: center;
+    color: var(--inbox-ink);
+    display: inline-flex;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+.admin-brand img {
+    display: block;
+    height: 2.4rem;
+    object-fit: contain;
+    width: auto;
+}
+
+.admin-brand span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .inbox-header-actions {
@@ -33,15 +75,41 @@ body.inbox-page {
 
 .inbox-user {
     color: var(--inbox-muted);
-    font-size: .78rem;
+    font-size: 0.78rem;
 }
+
+.admin-logout {
+    background: transparent;
+    border: 1px solid var(--inbox-line);
+    color: var(--inbox-ink);
+    cursor: pointer;
+    font: 600 0.68rem Arial, sans-serif;
+    letter-spacing: 0.06em;
+    padding: 0.55rem 0.8rem;
+    text-transform: uppercase;
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease;
+}
+
+.admin-logout:hover {
+    background: var(--inbox-ink);
+    border-color: var(--inbox-ink);
+    color: var(--inbox-white);
+}
+
+
+/* =========================================================
+   MAIN INBOX LAYOUT
+   ========================================================= */
 
 .inbox-shell {
     display: grid;
-    grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr) minmax(18rem, 22rem);
     height: calc(100vh - 4.75rem);
     margin: 0 auto;
-    max-width: 110rem;
+    max-width: 120rem;
 }
 
 .conversation-panel {
@@ -52,6 +120,11 @@ body.inbox-page {
 .conversation-panel + .conversation-panel {
     border-left: 1px solid var(--inbox-line);
 }
+
+
+/* =========================================================
+   CONVERSATION LIST HEADER
+   ========================================================= */
 
 .panel-heading,
 .conversation-detail-header {
@@ -64,12 +137,12 @@ body.inbox-page {
 }
 
 .panel-heading .auth-kicker {
-    margin-bottom: .45rem;
+    margin-bottom: 0.45rem;
 }
 
 .panel-heading h1 {
-    font: 400 1.9rem Georgia, 'Times New Roman', serif;
-    letter-spacing: -.03em;
+    font: 400 1.9rem Georgia, "Times New Roman", serif;
+    letter-spacing: -0.03em;
     margin: 0;
 }
 
@@ -79,16 +152,157 @@ body.inbox-page {
     border-radius: 50%;
     color: var(--inbox-accent);
     display: flex;
-    font-size: .75rem;
+    flex: 0 0 2rem;
+    font-size: 0.75rem;
+    font-weight: 700;
     height: 2rem;
     justify-content: center;
     width: 2rem;
 }
 
+
+/* =========================================================
+   CONVERSATION SEARCH
+   ========================================================= */
+
+.conversation-search {
+    align-items: center;
+    background: var(--inbox-surface);
+    border-bottom: 1px solid var(--inbox-line);
+    display: flex;
+    gap: 0.45rem;
+    padding: 0.85rem 1rem;
+    position: relative;
+}
+
+.conversation-search input[type="search"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #f8f4ed;
+    border: 1px solid var(--inbox-line);
+    border-radius: 0.45rem;
+    color: var(--inbox-ink);
+    flex: 1;
+    font: 0.76rem Arial, sans-serif;
+    min-width: 0;
+    outline: 0;
+    padding: 0.72rem 0.8rem;
+    padding-right: 2rem;
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.conversation-search input[type="search"]::placeholder {
+    color: #9a9185;
+}
+
+.conversation-search input[type="search"]:hover {
+    background: var(--inbox-surface);
+}
+
+.conversation-search input[type="search"]:focus {
+    background: var(--inbox-surface);
+    border-color: var(--inbox-accent);
+    box-shadow: 0 0 0 2px rgba(189, 107, 27, 0.1);
+}
+
+.conversation-search input[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.conversation-search-button {
+    background: var(--inbox-accent);
+    border: 1px solid var(--inbox-accent);
+    border-radius: 0.45rem;
+    color: var(--inbox-white);
+    cursor: pointer;
+    flex: 0 0 auto;
+    font: 700 0.63rem Arial, sans-serif;
+    letter-spacing: 0.06em;
+    padding: 0.72rem 0.8rem;
+    text-transform: uppercase;
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease;
+}
+
+.conversation-search-button:hover {
+    background: var(--inbox-accent-dark);
+    border-color: var(--inbox-accent-dark);
+}
+
+.conversation-search-button:active {
+    transform: translateY(1px);
+}
+
+.conversation-search-clear {
+    align-items: center;
+    background: transparent;
+    border-radius: 50%;
+    color: var(--inbox-muted);
+    display: flex;
+    font-size: 1rem;
+    height: 1.5rem;
+    justify-content: center;
+    position: absolute;
+    right: 6.25rem;
+    text-decoration: none;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5rem;
+}
+
+.conversation-search-clear:hover {
+    background: var(--inbox-line);
+    color: var(--inbox-ink);
+}
+
+.conversation-search-reset {
+    border: 1px solid var(--inbox-line);
+    color: var(--inbox-accent);
+    display: inline-block;
+    font-size: 0.68rem;
+    margin-top: 1rem;
+    padding: 0.55rem 0.8rem;
+    text-decoration: none;
+}
+
+.conversation-search-reset:hover {
+    background: var(--inbox-selected);
+    border-color: var(--inbox-accent);
+}
+
+
+/* =========================================================
+   CONVERSATION LIST
+   ========================================================= */
+
 .conversation-list {
     display: block;
-    height: calc(100% - 6rem);
+    height: calc(100% - 10.2rem);
+    overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.conversation-list::-webkit-scrollbar,
+.message-stream::-webkit-scrollbar {
+    width: 6px;
+}
+
+.conversation-list::-webkit-scrollbar-track,
+.message-stream::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.conversation-list::-webkit-scrollbar-thumb,
+.message-stream::-webkit-scrollbar-thumb {
+    background: var(--inbox-line);
+    border-radius: 999px;
 }
 
 .conversation-item {
@@ -96,22 +310,28 @@ body.inbox-page {
     border-bottom: 1px solid var(--inbox-line);
     color: inherit;
     display: flex;
-    gap: .8rem;
+    gap: 0.8rem;
     min-height: 7.1rem;
     padding: 1rem 1.25rem;
     position: relative;
     text-decoration: none;
-    transition: background 160ms ease;
+    transition:
+        background 160ms ease,
+        box-shadow 160ms ease;
 }
 
 .conversation-item:hover,
 .conversation-item.is-selected {
-    background: #fbf5ec;
+    background: var(--inbox-selected);
+}
+
+.conversation-item:hover {
+    box-shadow: inset 0 -1px 0 var(--inbox-line);
 }
 
 .conversation-item.is-selected::before {
     background: var(--inbox-accent);
-    content: '';
+    content: "";
     inset: 0 auto 0 0;
     position: absolute;
     width: 3px;
@@ -120,13 +340,15 @@ body.inbox-page {
 .conversation-avatar {
     align-items: center;
     background: var(--inbox-inbound);
+    border: 1px solid rgba(189, 107, 27, 0.08);
     border-radius: 50%;
     color: var(--inbox-accent);
     display: flex;
     flex: 0 0 2.35rem;
-    font: 700 .85rem Georgia, serif;
+    font: 700 0.85rem Georgia, serif;
     height: 2.35rem;
     justify-content: center;
+    text-transform: uppercase;
 }
 
 .conversation-avatar--large {
@@ -144,12 +366,13 @@ body.inbox-page {
 .conversation-topline {
     align-items: baseline;
     display: flex;
-    gap: .5rem;
+    gap: 0.5rem;
     justify-content: space-between;
 }
 
 .conversation-topline strong {
-    font: 700 .86rem Georgia, 'Times New Roman', serif;
+    font: 700 0.86rem Georgia, "Times New Roman", serif;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -159,13 +382,18 @@ body.inbox-page {
 .conversation-phone,
 .conversation-preview {
     color: var(--inbox-muted);
-    font-size: .7rem;
+    font-size: 0.7rem;
+}
+
+.conversation-topline time {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .conversation-phone,
 .conversation-preview {
     display: block;
-    margin-top: .28rem;
+    margin-top: 0.28rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -173,77 +401,103 @@ body.inbox-page {
 
 .conversation-preview {
     color: #5e574d;
-    margin-top: .55rem;
+    margin-top: 0.55rem;
 }
 
 .unread-badge {
     align-items: center;
     background: var(--inbox-accent);
     border-radius: 1rem;
-    color: white;
+    color: var(--inbox-white);
     display: flex;
     flex: 0 0 1.35rem;
-    font-size: .65rem;
+    font-size: 0.65rem;
+    font-weight: 700;
     height: 1.35rem;
     justify-content: center;
     margin-top: 1.35rem;
     min-width: 1.35rem;
+    padding: 0 0.25rem;
 }
+
+
+/* =========================================================
+   SELECTED CUSTOMER HEADER
+   ========================================================= */
 
 .conversation-detail {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .customer-heading {
     align-items: center;
     display: flex;
-    gap: .85rem;
+    gap: 0.85rem;
+    min-width: 0;
+}
+
+.customer-heading > div {
+    min-width: 0;
 }
 
 .customer-heading h2 {
-    font: 400 1.25rem Georgia, 'Times New Roman', serif;
+    font: 400 1.25rem Georgia, "Times New Roman", serif;
     margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .customer-heading p {
     color: var(--inbox-muted);
-    font-size: .72rem;
-    margin: .35rem 0 0;
+    font-size: 0.72rem;
+    margin: 0.35rem 0 0;
 }
 
 .channel-label {
     border-left: 1px solid var(--inbox-line);
     color: var(--inbox-accent);
-    margin-left: .5rem;
-    padding-left: .5rem;
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
 }
 
 .status-pill {
     border: 1px solid var(--inbox-line);
     color: var(--inbox-muted);
-    font-size: .65rem;
-    letter-spacing: .08em;
-    padding: .35rem .6rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.35rem 0.6rem;
     text-transform: uppercase;
 }
 
 .status-pill--open {
     border-color: #bed8bd;
-    color: #467145;
+    color: var(--inbox-success);
 }
 
+
+/* =========================================================
+   MESSAGE STREAM
+   ========================================================= */
+
 .message-stream {
+    background: var(--inbox-bg);
     flex: 1;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     padding: 1.5rem clamp(1rem, 5vw, 5rem);
+    scroll-behavior: smooth;
 }
 
 .message-day-label {
     color: var(--inbox-muted);
-    font-size: .65rem;
-    letter-spacing: .15em;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
     margin-bottom: 1.5rem;
     text-align: center;
     text-transform: uppercase;
@@ -251,7 +505,8 @@ body.inbox-page {
 
 .message-row {
     display: flex;
-    margin-bottom: .85rem;
+    margin-bottom: 0.85rem;
+    width: 100%;
 }
 
 .message-row--outbound {
@@ -260,37 +515,45 @@ body.inbox-page {
 
 .message-bubble {
     background: var(--inbox-inbound);
+    border: 1px solid rgba(229, 221, 208, 0.7);
     border-radius: 0 1rem 1rem 1rem;
     max-width: min(75%, 38rem);
-    padding: .85rem 1rem;
+    padding: 0.85rem 1rem;
 }
 
 .message-row--outbound .message-bubble {
     background: var(--inbox-ink);
+    border-color: var(--inbox-ink);
     border-radius: 1rem 0 1rem 1rem;
-    color: #fffdf9;
+    color: var(--inbox-surface);
 }
 
 .message-bubble p {
-    font-size: .86rem;
+    font-size: 0.86rem;
     line-height: 1.55;
     margin: 0;
+    overflow-wrap: anywhere;
     white-space: pre-wrap;
 }
 
 .message-bubble time {
     color: var(--inbox-muted);
     display: block;
-    font-size: .62rem;
-    margin-top: .55rem;
+    font-size: 0.62rem;
+    margin-top: 0.55rem;
 }
 
 .message-row--outbound .message-bubble time {
     color: #c9c1b6;
 }
 
+
+/* =========================================================
+   MESSAGE COMPOSER
+   ========================================================= */
+
 .message-composer {
-    background: #fbf8f2;
+    background: var(--inbox-composer);
     border-top: 1px solid var(--inbox-line);
     padding: 1rem clamp(1rem, 3vw, 2.5rem);
 }
@@ -298,19 +561,27 @@ body.inbox-page {
 .message-composer textarea {
     background: var(--inbox-surface);
     border: 1px solid var(--inbox-line);
-    border-radius: .35rem;
+    border-radius: 0.35rem;
     color: var(--inbox-ink);
-    font: .85rem/1.5 Arial, sans-serif;
+    display: block;
+    font: 0.85rem/1.5 Arial, sans-serif;
     min-height: 3.1rem;
     outline: 0;
-    padding: .8rem;
+    padding: 0.8rem;
     resize: vertical;
     width: 100%;
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.message-composer textarea::placeholder {
+    color: #9a9185;
 }
 
 .message-composer textarea:focus {
     border-color: var(--inbox-accent);
-    box-shadow: 0 0 0 2px rgba(189, 107, 27, .1);
+    box-shadow: 0 0 0 2px rgba(189, 107, 27, 0.1);
 }
 
 .composer-footer {
@@ -318,32 +589,147 @@ body.inbox-page {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-    margin-top: .65rem;
+    margin-top: 0.65rem;
 }
 
 .composer-error,
 .composer-status {
-    font-size: .72rem;
+    font-size: 0.72rem;
+    line-height: 1.4;
     margin: 0 auto 0 0;
 }
 
-.composer-error { color: #a33b2d; }
-.composer-status { color: #467145; }
+.composer-error {
+    color: var(--inbox-danger);
+}
+
+.composer-status {
+    color: var(--inbox-success);
+}
 
 .send-button {
+    align-items: center;
     background: var(--inbox-accent);
     border: 0;
-    color: white;
+    color: var(--inbox-white);
     cursor: pointer;
-    font: 700 .7rem Arial, sans-serif;
-    letter-spacing: .08em;
-    padding: .8rem 1rem;
+    display: inline-flex;
+    font: 700 0.7rem Arial, sans-serif;
+    gap: 0.55rem;
+    justify-content: center;
+    letter-spacing: 0.08em;
+    min-width: 8rem;
+    padding: 0.8rem 1rem;
     text-transform: uppercase;
+    transition:
+        background 160ms ease,
+        transform 160ms ease;
 }
 
 .send-button:hover {
-    background: #9f5314;
+    background: var(--inbox-accent-dark);
 }
+
+.send-button:active {
+    transform: translateY(1px);
+}
+
+.send-button:focus-visible,
+.admin-logout:focus-visible,
+.conversation-item:focus-visible,
+.conversation-search-button:focus-visible,
+.conversation-search-clear:focus-visible {
+    outline: 2px solid var(--inbox-accent);
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   CUSTOMER PROFILE PANEL
+   ========================================================= */
+
+.customer-profile-section-heading {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+}
+
+.customer-profile-section-heading h3 {
+    margin: 0;
+}
+
+.customer-notes-download {
+    color: var(--inbox-accent);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.customer-notes-download:hover {
+    color: var(--inbox-accent-dark);
+    text-decoration: underline;
+}
+
+.customer-notes-form {
+    display: grid;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+}
+
+.customer-notes-form textarea {
+    background: var(--inbox-surface);
+    border: 1px solid var(--inbox-line);
+    border-radius: 0.35rem;
+    color: var(--inbox-ink);
+    font: 0.74rem/1.5 Arial, sans-serif;
+    min-height: 7rem;
+    outline: 0;
+    padding: 0.75rem;
+    resize: vertical;
+    width: 100%;
+}
+
+.customer-notes-form textarea:focus {
+    border-color: var(--inbox-accent);
+    box-shadow: 0 0 0 2px rgba(189, 107, 27, 0.1);
+}
+
+.customer-notes-save {
+    background: var(--inbox-accent);
+    border: 0;
+    color: var(--inbox-white);
+    cursor: pointer;
+    font: 700 0.63rem Arial, sans-serif;
+    letter-spacing: 0.06em;
+    padding: 0.7rem 0.85rem;
+    text-transform: uppercase;
+}
+
+.customer-notes-save:hover {
+    background: var(--inbox-accent-dark);
+}
+
+.customer-notes-status {
+    color: var(--inbox-success);
+    font-size: 0.68rem;
+    line-height: 1.4;
+    margin: 0.6rem 0 0;
+}
+
+.customer-notes-error {
+    color: var(--inbox-danger);
+    font-size: 0.68rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+
+/* =========================================================
+   EMPTY STATES
+   ========================================================= */
 
 .inbox-empty {
     align-items: center;
@@ -361,6 +747,7 @@ body.inbox-page {
 }
 
 .inbox-empty--detail {
+    background: var(--inbox-bg);
     flex: 1;
 }
 
@@ -379,28 +766,175 @@ body.inbox-page {
 .inbox-empty h2 {
     color: var(--inbox-ink);
     font: 400 1.2rem Georgia, serif;
-    margin: 1rem 0 .35rem;
+    margin: 1rem 0 0.35rem;
 }
 
 .inbox-empty p {
-    font-size: .75rem;
+    font-size: 0.75rem;
     line-height: 1.5;
     margin: 0;
+    max-width: 25rem;
 }
 
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
 .sr-only {
+    clip: rect(0, 0, 0, 0);
     height: 1px;
     margin: -1px;
     overflow: hidden;
+    padding: 0;
     position: absolute;
+    white-space: nowrap;
     width: 1px;
-    clip: rect(0, 0, 0, 0);
 }
 
+
+
+.customer-profile-panel {
+    background: var(--inbox-surface);
+    border-left: 1px solid var(--inbox-line);
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.customer-profile-header {
+    border-bottom: 1px solid var(--inbox-line);
+    padding: 1.25rem 1.25rem 1rem;
+}
+
+.customer-profile-kicker {
+    color: var(--inbox-accent);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    margin: 0 0 0.4rem;
+    text-transform: uppercase;
+}
+
+.customer-profile-title {
+    font: 400 1.35rem Georgia, "Times New Roman", serif;
+    margin: 0;
+}
+
+.customer-profile-body {
+    padding: 1.25rem;
+}
+
+.customer-profile-identity {
+    align-items: center;
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.25rem;
+}
+
+.customer-profile-identity > div { min-width: 0; }
+
+.customer-profile-name {
+    font: 700 0.95rem Georgia, "Times New Roman", serif;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.customer-profile-phone {
+    color: var(--inbox-muted);
+    font-size: 0.7rem;
+    margin: 0.25rem 0 0;
+}
+
+.customer-profile-section {
+    border-top: 1px solid var(--inbox-line);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.customer-profile-section h3 {
+    color: var(--inbox-ink);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.65rem;
+    text-transform: uppercase;
+}
+
+.customer-notes {
+    background: #f8f4ed;
+    border: 1px solid var(--inbox-line);
+    border-radius: 0.45rem;
+    color: #5e574d;
+    font-size: 0.76rem;
+    line-height: 1.55;
+    margin: 0;
+    min-height: 5rem;
+    padding: 0.8rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.customer-profile-meta { display: grid; gap: 0.7rem; margin: 0; }
+.customer-profile-meta-row { display: flex; justify-content: space-between; gap: 1rem; }
+.customer-profile-meta dt { color: var(--inbox-muted); font-size: 0.68rem; }
+.customer-profile-meta dd { color: var(--inbox-ink); font-size: 0.7rem; margin: 0; text-align: right; }
+
+@media (max-width: 1100px) {
+    .inbox-shell { grid-template-columns: minmax(16rem, 21rem) minmax(0, 1fr); }
+    .customer-profile-panel { display: none; }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .inbox-shell {
+        grid-template-columns: minmax(16rem, 21rem) minmax(0, 1fr);
+    }
+
+    .conversation-item {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .message-stream {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    .message-bubble {
+        max-width: 82%;
+    }
+
+    .conversation-search {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
 @media (max-width: 760px) {
+
+    .inbox-header {
+        min-height: 4.25rem;
+        padding: 0.8rem 1rem;
+    }
+
     .inbox-shell {
         display: block;
         height: auto;
+        max-width: none;
+    }
+
+    .conversation-panel {
+        min-width: 0;
     }
 
     .conversation-panel + .conversation-panel {
@@ -414,18 +948,114 @@ body.inbox-page {
         max-height: 24rem;
     }
 
+    .conversation-detail-header {
+        min-height: 5.5rem;
+        padding: 1rem;
+    }
+
     .message-stream {
         min-height: 24rem;
+        padding: 1.25rem 1rem;
+    }
+
+    .message-composer {
+        padding: 0.85rem 1rem;
     }
 
     .inbox-user {
         display: none;
     }
+
+    .conversation-search {
+        padding: 0.75rem;
+    }
+
+    .conversation-search input[type="search"] {
+        padding: 0.7rem;
+        padding-right: 1.8rem;
+    }
+
+    .conversation-search-button {
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
+    }
+
+    .conversation-search-clear {
+        right: 5.2rem;
+    }
 }
 
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
 @media (max-width: 460px) {
+
     .admin-brand span {
         display: none;
+    }
+
+    .admin-brand img {
+        height: 2.2rem;
+    }
+
+    .inbox-header-actions {
+        gap: 0.5rem;
+    }
+
+    .admin-logout {
+        padding: 0.5rem 0.65rem;
+    }
+
+    .panel-heading {
+        min-height: 5.5rem;
+        padding: 1rem;
+    }
+
+    .panel-heading h1 {
+        font-size: 1.6rem;
+    }
+
+    .conversation-search {
+        gap: 0.35rem;
+        padding: 0.65rem;
+    }
+
+    .conversation-search input[type="search"] {
+        font-size: 0.7rem;
+        min-width: 0;
+    }
+
+    .conversation-search-button {
+        font-size: 0.58rem;
+        padding: 0.7rem 0.55rem;
+    }
+
+    .conversation-search-clear {
+        right: 4.7rem;
+    }
+
+    .conversation-item {
+        min-height: 6.6rem;
+        padding: 0.9rem 0.85rem;
+    }
+
+    .conversation-topline strong {
+        max-width: 60%;
+    }
+
+    .customer-heading {
+        gap: 0.65rem;
+    }
+
+    .customer-heading h2 {
+        font-size: 1.05rem;
+    }
+
+    .status-pill {
+        font-size: 0.58rem;
+        padding: 0.3rem 0.45rem;
     }
 
     .message-bubble {
@@ -440,5 +1070,30 @@ body.inbox-page {
     .composer-error,
     .composer-status {
         margin: 0;
+    }
+
+    .send-button {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .conversation-item,
+    .conversation-search input[type="search"],
+    .conversation-search-button,
+    .message-composer textarea,
+    .send-button,
+    .admin-logout {
+        transition: none;
+    }
+
+    .message-stream {
+        scroll-behavior: auto;
     }
 }

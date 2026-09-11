@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'provider_message_id',
     'status',
     'sent_at',
+    'read_at',
 ])]
 class Message extends Model
 {
@@ -26,6 +27,7 @@ class Message extends Model
     {
         return [
             'sent_at' => 'datetime',
+            'read_at' => 'datetime',
         ];
     }
 
