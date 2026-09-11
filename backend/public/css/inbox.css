@@ -1372,3 +1372,517 @@ body.inbox-page {
         scroll-behavior: auto;
     }
 }
+
+
+/* =========================================================
+   WONDER GODORO POINT — PREMIUM CRM UI
+   Visual layer: luxury ivory / charcoal / gold
+   Keeps existing Inbox markup and functionality intact.
+   ========================================================= */
+
+:root {
+    --inbox-bg: #f4f1eb;
+    --inbox-surface: #fffefa;
+    --inbox-line: #e6dfd3;
+    --inbox-ink: #181714;
+    --inbox-muted: #777166;
+    --inbox-accent: #b8944f;
+    --inbox-accent-dark: #8f6d31;
+    --inbox-inbound: #f0ece4;
+    --inbox-selected: #f7f1e5;
+    --inbox-composer: #faf7f1;
+    --inbox-success: #39704a;
+    --inbox-danger: #a94339;
+    --inbox-white: #ffffff;
+    --luxury-shadow: 0 18px 50px rgba(31, 27, 20, 0.08);
+    --soft-shadow: 0 5px 20px rgba(31, 27, 20, 0.06);
+}
+
+body.inbox-page {
+    background:
+        radial-gradient(circle at 8% 0%, rgba(184, 148, 79, 0.08), transparent 28rem),
+        radial-gradient(circle at 92% 100%, rgba(184, 148, 79, 0.06), transparent 30rem),
+        var(--inbox-bg);
+    color: var(--inbox-ink);
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    letter-spacing: -0.005em;
+}
+
+.inbox-header {
+    background: rgba(255, 254, 250, 0.94);
+    border-bottom: 1px solid rgba(184, 148, 79, 0.2);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+    min-height: 4.5rem;
+    padding: 0.8rem clamp(1rem, 3vw, 3rem);
+    position: relative;
+    z-index: 10;
+}
+
+.admin-brand {
+    gap: 0.85rem;
+}
+
+.admin-brand img {
+    height: 2.65rem;
+    filter: drop-shadow(0 4px 10px rgba(31, 27, 20, 0.08));
+}
+
+.admin-brand span {
+    color: #3c382f;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+
+.inbox-header-actions {
+    gap: 0.8rem;
+}
+
+.inbox-user {
+    color: #615b51;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.admin-logout {
+    background: #1d1b18;
+    border-color: #1d1b18;
+    border-radius: 999px;
+    color: #fffefa;
+    padding: 0.58rem 0.95rem;
+}
+
+.admin-logout:hover {
+    background: var(--inbox-accent-dark);
+    border-color: var(--inbox-accent-dark);
+}
+
+.inbox-shell {
+    background: var(--inbox-surface);
+    border: 1px solid rgba(184, 148, 79, 0.17);
+    border-top: 0;
+    box-shadow: var(--luxury-shadow);
+    height: calc(100vh - 4.5rem);
+    max-width: 126rem;
+    overflow: hidden;
+}
+
+.conversation-panel,
+.customer-profile-panel {
+    background: rgba(255, 254, 250, 0.98);
+}
+
+.conversation-panel + .conversation-panel,
+.customer-profile-panel {
+    border-color: var(--inbox-line);
+}
+
+.panel-heading,
+.conversation-detail-header {
+    background: linear-gradient(180deg, #fffefa 0%, #fcfaf5 100%);
+    border-bottom-color: var(--inbox-line);
+    min-height: 5.65rem;
+    padding: 1rem 1.35rem;
+}
+
+.panel-heading h1 {
+    color: #171613;
+    font-size: 1.7rem;
+    font-weight: 500;
+}
+
+.panel-heading .auth-kicker,
+.customer-profile-kicker {
+    color: var(--inbox-accent-dark);
+    font-weight: 800;
+}
+
+.conversation-count {
+    background: #f1e7d3;
+    color: var(--inbox-accent-dark);
+    box-shadow: inset 0 0 0 1px rgba(184, 148, 79, 0.12);
+}
+
+.conversation-search {
+    background: #fcfaf6;
+    border-bottom-color: var(--inbox-line);
+    padding: 0.75rem 0.9rem;
+}
+
+.conversation-search input[type="search"] {
+    background: #f5f1e9;
+    border-color: #e3dbce;
+    border-radius: 0.75rem;
+    font-size: 0.78rem;
+    padding: 0.76rem 0.9rem;
+}
+
+.conversation-search input[type="search"]:focus {
+    border-color: var(--inbox-accent);
+    box-shadow: 0 0 0 3px rgba(184, 148, 79, 0.13);
+}
+
+.conversation-search-button {
+    background: #1d1b18;
+    border-color: #1d1b18;
+    border-radius: 0.75rem;
+    min-width: 4.5rem;
+}
+
+.conversation-search-button:hover {
+    background: var(--inbox-accent-dark);
+    border-color: var(--inbox-accent-dark);
+}
+
+.conversation-list::-webkit-scrollbar-thumb,
+.message-stream::-webkit-scrollbar-thumb {
+    background: #d6cfc2;
+}
+
+.conversation-item {
+    border-bottom-color: #eee8de;
+    min-height: 6.65rem;
+    padding: 0.95rem 1.15rem;
+}
+
+.conversation-item:hover,
+.conversation-item.is-selected {
+    background: linear-gradient(90deg, #fbf6ec 0%, #fffdf9 100%);
+}
+
+.conversation-item.is-selected::before {
+    background: linear-gradient(180deg, #c8a55f, #9a7737);
+    border-radius: 0 4px 4px 0;
+    width: 4px;
+}
+
+.conversation-avatar {
+    background: #eee5d5;
+    border-color: rgba(184, 148, 79, 0.16);
+    color: #8b692f;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+}
+
+.conversation-topline strong {
+    color: #211f1b;
+    font-family: Inter, ui-sans-serif, Arial, sans-serif;
+    font-size: 0.84rem;
+}
+
+.conversation-preview {
+    color: #655f55;
+}
+
+.unread-badge {
+    background: #b8944f;
+    box-shadow: 0 4px 10px rgba(184, 148, 79, 0.22);
+}
+
+.conversation-detail-header {
+    position: relative;
+}
+
+.customer-heading h2 {
+    color: #171613;
+    font-family: Inter, ui-sans-serif, Arial, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+}
+
+.customer-heading p {
+    color: #777166;
+}
+
+.channel-label {
+    border-left-color: #ded5c6;
+    color: var(--inbox-accent-dark);
+    font-weight: 700;
+}
+
+.status-pill {
+    background: #fbf8f2;
+    border-color: #dfd6c8;
+    border-radius: 999px;
+    font-size: 0.6rem;
+    padding: 0.38rem 0.68rem;
+}
+
+.status-pill--open {
+    background: #f0f7f1;
+    border-color: #c9dfcd;
+}
+
+.message-stream {
+    background:
+        radial-gradient(circle at 50% 0%, rgba(184, 148, 79, 0.045), transparent 32rem),
+        #f5f2ec;
+    padding: 1.5rem clamp(1rem, 5vw, 5.5rem);
+}
+
+.message-day-label {
+    color: #948b7e;
+    letter-spacing: 0.13em;
+    margin-bottom: 1.25rem;
+}
+
+.message-row {
+    margin-bottom: 0.7rem;
+}
+
+.message-bubble {
+    background: #fffdf9;
+    border: 1px solid #e6dfd4;
+    border-radius: 0.35rem 1.15rem 1.15rem 1.15rem;
+    box-shadow: 0 3px 14px rgba(45, 39, 29, 0.045);
+    max-width: min(72%, 42rem);
+    padding: 0.78rem 0.92rem;
+}
+
+.message-row--outbound .message-bubble {
+    background: #24221e;
+    border-color: #24221e;
+    border-radius: 1.15rem 0.35rem 1.15rem 1.15rem;
+    box-shadow: 0 7px 20px rgba(28, 25, 21, 0.13);
+}
+
+.message-bubble p {
+    font-size: 0.84rem;
+    line-height: 1.55;
+}
+
+.message-bubble time {
+    color: #938a7e;
+    font-size: 0.6rem;
+}
+
+.message-row--outbound .message-bubble time {
+    color: #bdb5a9;
+}
+
+.message-media {
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 22px rgba(25, 22, 18, 0.08);
+}
+
+.message-media--video {
+    background: #151411;
+}
+
+.message-location {
+    background: rgba(255, 254, 250, 0.8);
+    border-color: #dfd7ca;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(25, 22, 18, 0.05);
+}
+
+.message-location-icon {
+    background: #eee3cf;
+}
+
+.message-location a {
+    color: var(--inbox-accent-dark);
+}
+
+.message-delete-button {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.message-composer {
+    background: rgba(255, 254, 250, 0.98);
+    border-top: 1px solid #dfd7ca;
+    box-shadow: 0 -8px 24px rgba(34, 30, 24, 0.035);
+    padding: 0.85rem clamp(1rem, 3vw, 2.5rem) 0.9rem;
+}
+
+.message-composer textarea {
+    background: #f7f4ee;
+    border-color: #e1d9cc;
+    border-radius: 0.9rem;
+    min-height: 3rem;
+    padding: 0.8rem 0.95rem;
+}
+
+.message-composer textarea:focus {
+    background: #fffefa;
+    border-color: var(--inbox-accent);
+    box-shadow: 0 0 0 3px rgba(184, 148, 79, 0.12);
+}
+
+.composer-tools {
+    gap: 0.4rem;
+}
+
+.composer-tool-button {
+    background: #f8f4ec;
+    border-color: #e1d9cc;
+    border-radius: 999px;
+    color: #4d473e;
+    min-height: 2.2rem;
+    padding: 0.5rem 0.78rem;
+}
+
+.composer-tool-button:hover {
+    background: #f1e8d7;
+    border-color: #c5a363;
+    color: #765823;
+}
+
+.send-button {
+    background: linear-gradient(135deg, #b8944f, #987334);
+    border-radius: 999px;
+    box-shadow: 0 7px 16px rgba(184, 148, 79, 0.22);
+    min-width: 8.5rem;
+    padding: 0.78rem 1.2rem;
+}
+
+.send-button:hover {
+    background: linear-gradient(135deg, #a88340, #866329);
+}
+
+.customer-profile-panel {
+    box-shadow: -8px 0 25px rgba(31, 27, 20, 0.035);
+}
+
+.customer-profile-header {
+    background: linear-gradient(180deg, #fffefa, #fbf8f2);
+}
+
+.customer-profile-title {
+    color: #171613;
+    font-family: Inter, ui-sans-serif, Arial, sans-serif;
+    font-size: 1.18rem;
+    font-weight: 750;
+}
+
+.customer-profile-identity {
+    background: #faf6ee;
+    border: 1px solid #e8dfd1;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+}
+
+.customer-profile-name {
+    font-family: Inter, ui-sans-serif, Arial, sans-serif;
+    font-size: 0.86rem;
+}
+
+.customer-profile-section {
+    border-top-color: #ebe4d9;
+}
+
+.customer-profile-section h3 {
+    color: #61594f;
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+}
+
+.customer-notes {
+    background: #f7f3eb;
+    border-color: #e3dacb;
+    border-radius: 0.75rem;
+}
+
+.customer-notes-form textarea {
+    background: #f7f3eb;
+    border-color: #e3dacb;
+    border-radius: 0.75rem;
+}
+
+.customer-notes-form textarea:focus {
+    background: #fffefa;
+    border-color: var(--inbox-accent);
+    box-shadow: 0 0 0 3px rgba(184, 148, 79, 0.11);
+}
+
+.customer-notes-save {
+    background: #1d1b18;
+    border-radius: 999px;
+    padding: 0.68rem 0.95rem;
+}
+
+.customer-notes-save:hover {
+    background: var(--inbox-accent-dark);
+}
+
+.customer-notes-download {
+    color: var(--inbox-accent-dark);
+}
+
+.inbox-empty {
+    background: transparent;
+}
+
+.empty-mark {
+    background: #faf6ee;
+    border-color: #ded4c4;
+    box-shadow: 0 8px 25px rgba(31, 27, 20, 0.05);
+}
+
+.inbox-empty h2 {
+    color: #24211d;
+    font-family: Inter, ui-sans-serif, Arial, sans-serif;
+    font-weight: 700;
+}
+
+/* Small polish for controls generated by the current Blade/JS. */
+button,
+a,
+input,
+textarea {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled,
+input:disabled,
+textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.62;
+}
+
+@media (max-width: 1100px) {
+    .inbox-shell {
+        border-left: 0;
+        border-right: 0;
+    }
+}
+
+@media (max-width: 760px) {
+    .inbox-header {
+        padding: 0.72rem 0.9rem;
+    }
+
+    .inbox-shell {
+        border: 0;
+        box-shadow: none;
+    }
+
+    .message-stream {
+        padding: 1rem 0.8rem;
+    }
+
+    .message-bubble {
+        max-width: 90%;
+    }
+
+    .composer-tool-button {
+        border-radius: 0.7rem;
+    }
+}
+
+@media (max-width: 460px) {
+    .panel-heading h1 {
+        font-size: 1.45rem;
+    }
+
+    .send-button {
+        min-height: 2.8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        scroll-behavior: auto !important;
+    }
+}
