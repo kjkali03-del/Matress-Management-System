@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AutomationController;
 use App\Http\Controllers\Admin\InboxController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Auth\LoginController;
@@ -82,6 +83,16 @@ Route::middleware('auth')->group(function () {
             )->name('inbox.customers.notes.download');
 
             Route::resource('products', ProductController::class);
+
+            /*
+             * Automation
+             */
+            Route::resource('automations', AutomationController::class);
+
+            Route::patch(
+                '/automations/{automation}/toggle',
+                [AutomationController::class, 'toggle']
+            )->name('automations.toggle');
         });
 });
 
