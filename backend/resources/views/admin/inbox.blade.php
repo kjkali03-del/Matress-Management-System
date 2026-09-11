@@ -401,19 +401,96 @@
 
                                     <div class="message-bubble">
 
-                                        <p>
-                                            {{ $message->body }}
-                                        </p>
-
-                                        <time
-                                            datetime="{{ $message->created_at->toIso8601String() }}"
-                                        >
-                                            {{ $message->created_at->format('M j, g:i A') }}
-
-                                            @if ($message->status)
-                                                · {{ ucfirst($message->status) }}
+                                        @if ($message->message_type === 'image')
+                                            @if ($message->media_url)
+                                                <img
+                                                    class="message-media message-media--image"
+                                                    src="{{ $message->media_url }}"
+                                                    alt="{{ $message->media_filename ?: 'WhatsApp image' }}"
+                                                    loading="lazy"
+                                                >
+                                            @else
+                                                <div class="message-media-placeholder">
+                                                    <span aria-hidden="true">📷</span>
+                                                    <span>{{ $message->media_filename ?: 'Image sent' }}</span>
+                                                </div>
                                             @endif
-                                        </time>
+
+                                            @if ($message->media_caption || $message->body)
+                                                <p>{{ $message->media_caption ?: $message->body }}</p>
+                                            @endif
+                                        @elseif ($message->message_type === 'video')
+                                            @if ($message->media_url)
+                                                <video
+                                                    class="message-media message-media--video"
+                                                    controls
+                                                    preload="metadata"
+                                                >
+                                                    <source
+                                                        src="{{ $message->media_url }}"
+                                                        type="{{ $message->media_mime_type ?: 'video/mp4' }}"
+                                                    >
+                                                </video>
+                                            @else
+                                                <div class="message-media-placeholder">
+                                                    <span aria-hidden="true">🎥</span>
+                                                    <span>{{ $message->media_filename ?: 'Video sent' }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if ($message->media_caption || $message->body)
+                                                <p>{{ $message->media_caption ?: $message->body }}</p>
+                                            @endif
+                                        @elseif ($message->message_type === 'location')
+                                            <div class="message-location">
+                                                <div class="message-location-icon" aria-hidden="true">📍</div>
+                                                <div>
+                                                    <strong>{{ $message->location_name ?: 'Location' }}</strong>
+                                                    @if ($message->location_address)
+                                                        <span>{{ $message->location_address }}</span>
+                                                    @endif
+                                                    <a
+                                                        href="https://www.google.com/maps?q={{ $message->latitude }},{{ $message->longitude }}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        Open in Maps
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <p>{{ $message->body }}</p>
+                                        @endif
+
+                                        <div class="message-meta">
+                                            <time
+                                                datetime="{{ $message->created_at->toIso8601String() }}"
+                                            >
+                                                {{ $message->created_at->format('M j, g:i A') }}
+
+                                                @if ($message->status)
+                                                    · {{ ucfirst($message->status) }}
+                                                @endif
+                                            </time>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ route('admin.inbox.messages.destroy', $message) }}"
+                                                class="message-delete-form"
+                                                onsubmit="return confirm('Delete this message from the Inbox?');"
+                                            >
+                                                @csrf
+                                                @method('DELETE')
+                                                <button
+                                                    type="submit"
+                                                    class="message-delete-button"
+                                                    title="Delete from Inbox"
+                                                    aria-label="Delete message"
+                                                >
+                                                    &times;
+                                                </button>
+                                            </form>
+                                        </div>
 
                                     </div>
 
@@ -426,66 +503,123 @@
                     </div>
 
 
-                    <form
-                        class="message-composer"
-                        method="POST"
-                        action="{{ route('admin.inbox.messages.store', $selectedConversation) }}"
-                    >
+                    <div class="message-composer">
 
-                        @csrf
-
-                        <label
-                            class="sr-only"
-                            for="body"
+                        <form
+                            class="composer-text-form"
+                            method="POST"
+                            action="{{ route('admin.inbox.messages.store', $selectedConversation) }}"
                         >
-                            Write a message
-                        </label>
+                            @csrf
 
-
-                        <textarea
-                            id="body"
-                            name="body"
-                            rows="2"
-                            maxlength="5000"
-                            placeholder="Write a reply..."
-                            required
-                        >{{ old('body') }}</textarea>
-
-
-                        <div class="composer-footer">
-
-                            @error('body')
-
-                                <p class="composer-error">
-                                    {{ $message }}
-                                </p>
-
-                            @enderror
-
-
-                            @if (session('status'))
-
-                                <p class="composer-status">
-                                    {{ session('status') }}
-                                </p>
-
-                            @endif
-
-
-                            <button
-                                type="submit"
-                                class="send-button"
+                            <label
+                                class="sr-only"
+                                for="body"
                             >
-                                Send message
+                                Write a message
+                            </label>
 
-                                <span aria-hidden="true">
-                                    &rarr;
-                                </span>
-                            </button>
+                            <textarea
+                                id="body"
+                                name="body"
+                                rows="2"
+                                maxlength="5000"
+                                placeholder="Write a reply..."
+                            >{{ old('body') }}</textarea>
 
-                        </div>
+                            <div class="composer-footer">
+                                <div class="composer-tools" aria-label="Message attachments">
+                                    <label class="composer-tool-button" title="Attach photo">
+                                        <span aria-hidden="true">📷</span>
+                                        <span>Photo</span>
+                                        <input
+                                            type="file"
+                                            name="image"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            form="image-upload-form"
+                                            hidden
+                                            id="image-picker"
+                                        >
+                                    </label>
 
-                    </form>
+                                    <label class="composer-tool-button" title="Attach video">
+                                        <span aria-hidden="true">🎥</span>
+                                        <span>Video</span>
+                                        <input
+                                            type="file"
+                                            name="video"
+                                            accept="video/mp4,video/3gpp"
+                                            form="video-upload-form"
+                                            hidden
+                                            id="video-picker"
+                                        >
+                                    </label>
+
+                                    <button
+                                        type="button"
+                                        class="composer-tool-button"
+                                        id="send-location-button"
+                                        title="Send current location"
+                                    >
+                                        <span aria-hidden="true">📍</span>
+                                        <span>Location</span>
+                                    </button>
+                                </div>
+
+                                <div class="composer-actions">
+                                    @error('body')
+                                        <p class="composer-error">{{ $message }}</p>
+                                    @enderror
+
+                                    @error('image')
+                                        <p class="composer-error">{{ $message }}</p>
+                                    @enderror
+
+                                    @error('video')
+                                        <p class="composer-error">{{ $message }}</p>
+                                    @enderror
+
+                                    @if (session('status'))
+                                        <p class="composer-status">{{ session('status') }}</p>
+                                    @endif
+
+                                    <button type="submit" class="send-button">
+                                        Send message
+                                        <span aria-hidden="true">&rarr;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <form
+                            method="POST"
+                            action="{{ route('admin.inbox.messages.image', $selectedConversation) }}"
+                            enctype="multipart/form-data"
+                            id="image-upload-form"
+                            hidden
+                        >
+                            @csrf
+                            <input type="file" name="image" id="image-upload-input" required>
+                            <input type="hidden" name="caption" id="image-caption">
+                        </form>
+
+                        <form
+                            method="POST"
+                            action="{{ route('admin.inbox.messages.video', $selectedConversation) }}"
+                            enctype="multipart/form-data"
+                            id="video-upload-form"
+                            hidden
+                        >
+                            @csrf
+                            <input type="file" name="video" id="video-upload-input" required>
+                            <input type="hidden" name="caption" id="video-caption">
+                        </form>
+
+                        <p class="composer-hint" id="composer-hint" aria-live="polite">
+                            Photo, Video and Location are available from the attachment buttons.
+                        </p>
+
+                    </div>
 
                 @else
 
@@ -789,6 +923,99 @@
 
         @if ($selectedConversation)
 
+            {{-- Composer attachments and location --}}
+            <script>
+                (() => {
+                    const imagePicker = document.getElementById('image-picker');
+                    const videoPicker = document.getElementById('video-picker');
+                    const imageUploadInput = document.getElementById('image-upload-input');
+                    const videoUploadInput = document.getElementById('video-upload-input');
+                    const imageCaption = document.getElementById('image-caption');
+                    const videoCaption = document.getElementById('video-caption');
+                    const body = document.getElementById('body');
+                    const locationButton = document.getElementById('send-location-button');
+                    const hint = document.getElementById('composer-hint');
+
+                    function setHint(text) {
+                        if (hint) hint.textContent = text;
+                    }
+
+                    imagePicker?.addEventListener('change', () => {
+                        if (!imagePicker.files?.length || !imageUploadInput) return;
+                        imageUploadInput.files = imagePicker.files;
+                        imageCaption.value = body?.value?.trim() || '';
+                        setHint(`Sending: ${imagePicker.files[0].name}`);
+                        document.getElementById('image-upload-form')?.submit();
+                    });
+
+                    videoPicker?.addEventListener('change', () => {
+                        if (!videoPicker.files?.length || !videoUploadInput) return;
+                        videoUploadInput.files = videoPicker.files;
+                        videoCaption.value = body?.value?.trim() || '';
+                        setHint(`Sending: ${videoPicker.files[0].name}`);
+                        document.getElementById('video-upload-form')?.submit();
+                    });
+
+                    locationButton?.addEventListener('click', () => {
+                        if (!navigator.geolocation) {
+                            setHint('This browser does not support location sharing.');
+                            return;
+                        }
+
+                        locationButton.disabled = true;
+                        setHint('Getting your current location...');
+
+                        navigator.geolocation.getCurrentPosition(async (position) => {
+                            try {
+                                const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                                const response = await fetch(@json(route('admin.inbox.messages.location', $selectedConversation)), {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-TOKEN': token,
+                                    },
+                                    body: JSON.stringify({
+                                        latitude: position.coords.latitude,
+                                        longitude: position.coords.longitude,
+                                    }),
+                                });
+
+                                const data = await response.json();
+                                if (!response.ok) throw new Error(data.message || 'Unable to send location.');
+
+                                if (data.data) {
+                                    window.dispatchEvent(
+                                        new CustomEvent('inbox:message-created', {
+                                            detail: data.data,
+                                        })
+                                    );
+                                }
+
+                                setHint('Current location sent successfully.');
+                            } catch (error) {
+                                console.error('Location send failed.', error);
+                                setHint(error.message || 'Unable to send location.');
+                            } finally {
+                                locationButton.disabled = false;
+                            }
+                        }, (error) => {
+                            locationButton.disabled = false;
+                            const messages = {
+                                1: 'Location permission was denied. Allow location access and try again.',
+                                2: 'Your location could not be determined. Try again.',
+                                3: 'Location request timed out. Try again.',
+                            };
+                            setHint(messages[error.code] || 'Unable to get your location.');
+                        }, {
+                            enableHighAccuracy: true,
+                            timeout: 15000,
+                            maximumAge: 0,
+                        });
+                    });
+                })();
+            </script>
+
             {{-- Message polling --}}
             <script>
                 (() => {
@@ -846,103 +1073,106 @@
                     }
 
 
-                    function appendMessage(message) {
-
-                        if (
-                            document.querySelector(
-                                `[data-message-id="${message.id}"]`
-                            )
-                        ) {
-                            return;
-                        }
-
-
-                        const row =
-                            document.createElement(
-                                'article'
-                            );
-
-                        row.className =
-                            `message-row message-row--${message.direction}`;
-
-                        row.dataset.messageId =
-                            message.id;
-
-
-                        const bubble =
-                            document.createElement(
-                                'div'
-                            );
-
-                        bubble.className =
-                            'message-bubble';
-
-
-                        const body =
-                            document.createElement(
-                                'p'
-                            );
-
-                        body.textContent =
-                            message.body || '';
-
-
-                        const time =
-                            document.createElement(
-                                'time'
-                            );
-
-
-                        if (message.created_at) {
-
-                            time.dateTime =
-                                message.created_at;
-
-                            time.textContent =
-                                new Date(
-                                    message.created_at
-                                ).toLocaleString(
-                                    undefined,
-                                    {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        hour: 'numeric',
-                                        minute: '2-digit',
-                                    }
-                                );
-                        }
-
-
-                        if (message.status) {
-
-                            const status =
-                                message.status
-                                    .charAt(0)
-                                    .toUpperCase()
-                                + message.status.slice(1);
-
-
-                            time.textContent +=
-                                ` · ${status}`;
-                        }
-
-
-                        bubble.appendChild(body);
-
-                        bubble.appendChild(time);
-
-                        row.appendChild(bubble);
-
-                        stream.appendChild(row);
-
-
-                        lastMessageId =
-                            Math.max(
-                                lastMessageId,
-                                Number(message.id) || 0
-                            );
+                    function escapeHtml(value) {
+                        const div = document.createElement('div');
+                        div.textContent = value ?? '';
+                        return div.innerHTML;
                     }
 
+                    function messageContentHtml(message) {
+                        const type = message.message_type || 'text';
+                        const caption = message.media_caption || message.body || '';
+
+                        if (type === 'image') {
+                            const media = message.media_url
+                                ? `<img class="message-media message-media--image" src="${escapeHtml(message.media_url)}" alt="${escapeHtml(message.media_filename || 'WhatsApp image')}" loading="lazy">`
+                                : `<div class="message-media-placeholder"><span aria-hidden="true">📷</span><span>${escapeHtml(message.media_filename || 'Image sent')}</span></div>`;
+                            return `${media}${caption ? `<p>${escapeHtml(caption)}</p>` : ''}`;
+                        }
+
+                        if (type === 'video') {
+                            const media = message.media_url
+                                ? `<video class="message-media message-media--video" controls preload="metadata"><source src="${escapeHtml(message.media_url)}" type="${escapeHtml(message.media_mime_type || 'video/mp4')}"></video>`
+                                : `<div class="message-media-placeholder"><span aria-hidden="true">🎥</span><span>${escapeHtml(message.media_filename || 'Video sent')}</span></div>`;
+                            return `${media}${caption ? `<p>${escapeHtml(caption)}</p>` : ''}`;
+                        }
+
+                        if (type === 'location') {
+                            const lat = Number(message.latitude);
+                            const lng = Number(message.longitude);
+                            const mapUrl = Number.isFinite(lat) && Number.isFinite(lng)
+                                ? `https://www.google.com/maps?q=${lat},${lng}`
+                                : '#';
+                            return `<div class="message-location"><div class="message-location-icon" aria-hidden="true">📍</div><div><strong>${escapeHtml(message.location_name || 'Location')}</strong>${message.location_address ? `<span>${escapeHtml(message.location_address)}</span>` : ''}<a href="${mapUrl}" target="_blank" rel="noopener noreferrer">Open in Maps</a></div></div>`;
+                        }
+
+                        return `<p>${escapeHtml(message.body || '')}</p>`;
+                    }
+
+                    window.addEventListener('inbox:message-created', (event) => {
+                        if (event.detail) {
+                            appendMessage(event.detail);
+                            scrollToBottom();
+                        }
+                    });
+
+
+                    function appendMessage(message) {
+                        if (document.querySelector(`[data-message-id="${message.id}"]`)) return;
+
+                        const row = document.createElement('article');
+                        row.className = `message-row message-row--${message.direction}`;
+                        row.dataset.messageId = message.id;
+
+                        const bubble = document.createElement('div');
+                        bubble.className = 'message-bubble';
+                        bubble.innerHTML = messageContentHtml(message);
+
+                        const meta = document.createElement('div');
+                        meta.className = 'message-meta';
+
+                        const time = document.createElement('time');
+                        if (message.created_at) {
+                            time.dateTime = message.created_at;
+                            time.textContent = new Date(message.created_at).toLocaleString(undefined, {
+                                month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+                            });
+                        }
+
+                        if (message.status) {
+                            const status = message.status.charAt(0).toUpperCase() + message.status.slice(1);
+                            time.textContent += ` · ${status}`;
+                        }
+                        meta.appendChild(time);
+
+                        const deleteForm = document.createElement('form');
+                        deleteForm.method = 'POST';
+                        deleteForm.action = `{{ url('/admin/inbox/messages') }}/${message.id}`;
+                        deleteForm.className = 'message-delete-form';
+                        deleteForm.onsubmit = () => confirm('Delete this message from the Inbox?');
+
+                        const csrf = document.createElement('input');
+                        csrf.type = 'hidden'; csrf.name = '_token';
+                        csrf.value = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+                        const method = document.createElement('input');
+                        method.type = 'hidden'; method.name = '_method'; method.value = 'DELETE';
+
+                        const button = document.createElement('button');
+                        button.type = 'submit';
+                        button.className = 'message-delete-button';
+                        button.title = 'Delete from Inbox';
+                        button.setAttribute('aria-label', 'Delete message');
+                        button.textContent = '×';
+
+                        deleteForm.append(csrf, method, button);
+                        meta.appendChild(deleteForm);
+                        bubble.appendChild(meta);
+                        row.appendChild(bubble);
+                        stream.appendChild(row);
+
+                        lastMessageId = Math.max(lastMessageId, Number(message.id) || 0);
+                    }
 
                     async function pollMessages() {
 

@@ -5,9 +5,9 @@ namespace Tests\Feature;
 use App\Models\Conversation;
 use App\Models\Customer;
 use App\Models\Message;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CustomerCommunicationTest extends TestCase
@@ -77,5 +77,89 @@ class CustomerCommunicationTest extends TestCase
 
         $this->assertDatabaseMissing('conversations', ['id' => $conversation->id]);
         $this->assertDatabaseMissing('messages', ['id' => $message->id]);
+    }
+
+    public function test_image_message_can_store_media_metadata(): void
+    {
+        $conversation = Conversation::factory()->create();
+
+        $message = Message::factory()->for($conversation)->create([
+            'message_type' => 'image',
+            'body' => null,
+            'media_id' => 'media-image-001',
+            'media_url' => 'https://example.com/image.jpg',
+            'media_mime_type' => 'image/jpeg',
+            'media_filename' => 'mattress.jpg',
+            'media_caption' => 'Wonder Godoro Point mattress',
+        ]);
+
+        $this->assertDatabaseHas('messages', [
+            'id' => $message->id,
+            'message_type' => 'image',
+            'media_id' => 'media-image-001',
+            'media_mime_type' => 'image/jpeg',
+            'media_filename' => 'mattress.jpg',
+            'media_caption' => 'Wonder Godoro Point mattress',
+        ]);
+
+        $this->assertSame(
+            'https://example.com/image.jpg',
+            $message->fresh()->media_url
+        );
+    }
+
+    public function test_video_message_can_store_media_metadata(): void
+    {
+        $conversation = Conversation::factory()->create();
+
+        $message = Message::factory()->for($conversation)->create([
+            'message_type' => 'video',
+            'body' => null,
+            'media_id' => 'media-video-001',
+            'media_url' => 'https://example.com/product-video.mp4',
+            'media_mime_type' => 'video/mp4',
+            'media_filename' => 'product-video.mp4',
+            'media_caption' => 'Video ya godoro la Wonder Godoro Point',
+        ]);
+
+        $this->assertDatabaseHas('messages', [
+            'id' => $message->id,
+            'message_type' => 'video',
+            'media_id' => 'media-video-001',
+            'media_mime_type' => 'video/mp4',
+            'media_filename' => 'product-video.mp4',
+            'media_caption' => 'Video ya godoro la Wonder Godoro Point',
+        ]);
+
+        $this->assertSame(
+            'https://example.com/product-video.mp4',
+            $message->fresh()->media_url
+        );
+    }
+
+    public function test_location_message_can_store_coordinates(): void
+    {
+        $conversation = Conversation::factory()->create();
+
+        $message = Message::factory()->for($conversation)->create([
+            'message_type' => 'location',
+            'body' => null,
+            'latitude' => -6.7924000,
+            'longitude' => 39.2083000,
+            'location_name' => 'Wonder Godoro Point',
+            'location_address' => 'Dar es Salaam, Tanzania',
+        ]);
+
+        $freshMessage = $message->fresh();
+
+        $this->assertDatabaseHas('messages', [
+            'id' => $message->id,
+            'message_type' => 'location',
+            'location_name' => 'Wonder Godoro Point',
+            'location_address' => 'Dar es Salaam, Tanzania',
+        ]);
+
+        $this->assertSame('-6.7924000', $freshMessage->latitude);
+        $this->assertSame('39.2083000', $freshMessage->longitude);
     }
 }

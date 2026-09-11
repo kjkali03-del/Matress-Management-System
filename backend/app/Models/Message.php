@@ -17,6 +17,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'status',
     'sent_at',
     'read_at',
+    'media_id',
+    'media_url',
+    'media_mime_type',
+    'media_filename',
+    'media_caption',
+    'latitude',
+    'longitude',
+    'location_name',
+    'location_address',
 ])]
 class Message extends Model
 {
@@ -28,6 +37,8 @@ class Message extends Model
         return [
             'sent_at' => 'datetime',
             'read_at' => 'datetime',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 

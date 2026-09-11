@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Customer;
+use App\Models\Message;
 use App\Services\ConversationMessageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\View\View;
 
 class InboxController extends Controller
@@ -90,11 +92,21 @@ class InboxController extends Controller
             ->orderBy('created_at')
             ->orderBy('id')
             ->get()
-            ->map(fn ($message) => [
+            ->map(fn (Message $message) => [
                 'id' => $message->id,
                 'direction' => $message->direction,
+                'message_type' => $message->message_type,
                 'body' => $message->body,
                 'status' => $message->status,
+                'media_id' => $message->media_id,
+                'media_url' => $message->media_url,
+                'media_mime_type' => $message->media_mime_type,
+                'media_filename' => $message->media_filename,
+                'media_caption' => $message->media_caption,
+                'latitude' => $message->latitude,
+                'longitude' => $message->longitude,
+                'location_name' => $message->location_name,
+                'location_address' => $message->location_address,
                 'created_at' => $message->created_at?->toISOString(),
             ]);
 
@@ -119,6 +131,141 @@ class InboxController extends Controller
         return redirect()->route('admin.inbox', [
             'conversation' => $conversation->id,
         ])->with('status', 'Message saved to the conversation.');
+    }
+
+    public function sendImage(
+        Request $request,
+        Conversation $conversation
+    ): RedirectResponse {
+        $validated = $request->validate([
+            'image' => [
+                'required',
+                'file',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
+            'caption' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
+        ]);
+
+        /** @var UploadedFile $image */
+        $image = $validated['image'];
+
+        $this->messageService->sendImageFile(
+            $conversation,
+            $image,
+            filled($validated['caption'] ?? null)
+                ? trim((string) $validated['caption'])
+                : null
+        );
+
+        return redirect()->route('admin.inbox', [
+            'conversation' => $conversation->id,
+        ])->with('status', 'Image sent successfully.');
+    }
+
+    public function sendVideo(
+        Request $request,
+        Conversation $conversation
+    ): RedirectResponse {
+        $validated = $request->validate([
+            'video' => [
+                'required',
+                'file',
+                'mimes:mp4,3gp',
+                'max:16384',
+            ],
+            'caption' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
+        ]);
+
+        /** @var UploadedFile $video */
+        $video = $validated['video'];
+
+        $this->messageService->sendVideoFile(
+            $conversation,
+            $video,
+            filled($validated['caption'] ?? null)
+                ? trim((string) $validated['caption'])
+                : null
+        );
+
+        return redirect()->route('admin.inbox', [
+            'conversation' => $conversation->id,
+        ])->with('status', 'Video sent successfully.');
+    }
+
+    public function sendLocation(
+        Request $request,
+        Conversation $conversation
+    ): JsonResponse {
+        $validated = $request->validate([
+            'latitude' => [
+                'required',
+                'numeric',
+                'between:-90,90',
+            ],
+            'longitude' => [
+                'required',
+                'numeric',
+                'between:-180,180',
+            ],
+            'name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+            'address' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+        ]);
+
+        $message = $this->messageService->sendLocation(
+            $conversation,
+            (float) $validated['latitude'],
+            (float) $validated['longitude'],
+            filled($validated['name'] ?? null)
+                ? trim((string) $validated['name'])
+                : null,
+            filled($validated['address'] ?? null)
+                ? trim((string) $validated['address'])
+                : null,
+        );
+
+        return response()->json([
+            'message' => 'Location sent successfully.',
+            'data' => [
+                'id' => $message->id,
+                'direction' => $message->direction,
+                'message_type' => $message->message_type,
+                'latitude' => $message->latitude,
+                'longitude' => $message->longitude,
+                'location_name' => $message->location_name,
+                'location_address' => $message->location_address,
+                'status' => $message->status,
+                'created_at' => $message->created_at?->toISOString(),
+            ],
+        ]);
+    }
+
+    public function destroyMessage(Message $message): RedirectResponse
+    {
+        $conversationId = $message->conversation_id;
+
+        $message->delete();
+
+        return redirect()->route('admin.inbox', [
+            'conversation' => $conversationId,
+        ])->with('status', 'Message deleted from the Inbox.');
     }
 
     public function updateCustomerNotes(

@@ -51,6 +51,26 @@ Route::middleware('auth')->group(function () {
                 [InboxController::class, 'store']
             )->name('inbox.messages.store');
 
+            Route::post(
+                '/inbox/{conversation}/media/image',
+                [InboxController::class, 'sendImage']
+            )->name('inbox.messages.image');
+
+            Route::post(
+                '/inbox/{conversation}/media/video',
+                [InboxController::class, 'sendVideo']
+            )->name('inbox.messages.video');
+
+            Route::post(
+                '/inbox/{conversation}/location',
+                [InboxController::class, 'sendLocation']
+            )->name('inbox.messages.location');
+
+            Route::delete(
+                '/inbox/messages/{message}',
+                [InboxController::class, 'destroyMessage']
+            )->name('inbox.messages.destroy');
+
             Route::patch(
                 '/inbox/customers/{customer}/notes',
                 [InboxController::class, 'updateCustomerNotes']
