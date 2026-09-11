@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Automation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -55,8 +54,9 @@ class AutomationController extends Controller
             ->with('success', 'Automation updated successfully.');
     }
 
-    public function destroy(Automation $automation): RedirectResponse
-    {
+    public function destroy(
+        Automation $automation
+    ): RedirectResponse {
         $automation->delete();
 
         return redirect()
@@ -64,8 +64,9 @@ class AutomationController extends Controller
             ->with('success', 'Automation deleted successfully.');
     }
 
-    public function toggle(Automation $automation): RedirectResponse
-    {
+    public function toggle(
+        Automation $automation
+    ): RedirectResponse {
         $automation->update([
             'is_active' => ! $automation->is_active,
         ]);
@@ -75,14 +76,11 @@ class AutomationController extends Controller
             ->with('success', 'Automation status updated.');
     }
 
-    /**
-     * Validate and normalize automation data.
-     *
-     * @return array<string, mixed>
-     */
     private function validateAutomation(
         Request $request
     ): array {
+        $trigger = (string) $request->input('trigger');
+
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -111,29 +109,35 @@ class AutomationController extends Controller
                 'array',
             ],
 
-            'conditions.0.value' => [
-                Rule::requiredIf(
-                    fn () => $request->input('trigger') === 'keyword'
-                ),
+            'conditions.*.type' => [
+                'nullable',
+                'string',
+                Rule::in([
+                    'keyword',
+                    'delay',
+                ]),
+            ],
+
+            'conditions.*.value' => [
                 'nullable',
                 'string',
                 'max:255',
             ],
 
-            'conditions.0.delay_value' => [
-                Rule::requiredIf(
-                    fn () => $request->input('trigger') === 'no_reply'
-                ),
+            'conditions.*.response' => [
+                'nullable',
+                'string',
+                'max:4096',
+            ],
+
+            'conditions.*.delay_value' => [
                 'nullable',
                 'integer',
                 'min:1',
                 'max:720',
             ],
 
-            'conditions.0.delay_unit' => [
-                Rule::requiredIf(
-                    fn () => $request->input('trigger') === 'no_reply'
-                ),
+            'conditions.*.delay_unit' => [
                 'nullable',
                 Rule::in([
                     'minutes',
@@ -143,21 +147,20 @@ class AutomationController extends Controller
             ],
 
             'actions' => [
-                'required',
+                'nullable',
                 'array',
-                'min:1',
             ],
 
-            'actions.0.type' => [
-                'required',
+            'actions.*.type' => [
+                'required_with:actions',
                 'string',
                 Rule::in([
                     'send_text',
                 ]),
             ],
 
-            'actions.0.message' => [
-                'required',
+            'actions.*.message' => [
+                'required_with:actions',
                 'string',
                 'max:4096',
             ],
@@ -168,75 +171,265 @@ class AutomationController extends Controller
             ],
         ]);
 
-        $validated['is_active'] = $request->boolean('is_active');
+        /*
+         * KEYWORD AUTOMATION
+         *
+         * Each keyword carries its own response:
+         *
+         * conditions:
+         * [
+         *     [
+         *         'type' => 'keyword',
+         *         'value' => 'bei',
+         *         'response' => 'Bei zetu ni...'
+         *     ],
+         *     [
+         *         'type' => 'keyword',
+         *         'value' => 'delivery',
+         *         'response' => 'Delivery ni bure...'
+         *     ]
+         * ]
+         */
+        if ($trigger === 'keyword') {
+            $conditions = $validated['conditions'] ?? [];
 
-        $validated['conditions'] = $this->normalizeConditions(
-            $validated['trigger'],
-            $validated['conditions'] ?? []
+            $conditions = array_values(
+                array_filter(
+                    $conditions,
+                    function ($condition): bool {
+                        if (! is_array($condition)) {
+                            return false;
+                        }
+
+                        return ($condition['type'] ?? null) === 'keyword'
+                            && trim(
+                                (string) ($condition['value'] ?? '')
+                            ) !== ''
+                            && trim(
+                                (string) ($condition['response'] ?? '')
+                            ) !== '';
+                    }
+                )
+            );
+
+            if ($conditions === []) {
+                abort(
+                    422,
+                    'At least one keyword with its response is required.'
+                );
+            }
+
+            $validated['conditions'] =
+                $this->normalizeKeywordConditions($conditions);
+
+            /*
+             * Keyword automations do not need a generic action.
+             * Their response is stored beside each keyword.
+             */
+            $validated['actions'] = [];
+        }
+
+        /*
+         * MESSAGE RECEIVED
+         */
+        elseif ($trigger === 'message_received') {
+
+            $conditions = $validated['conditions'] ?? [];
+
+            $validated['conditions'] =
+                $this->normalizeOptionalKeywordConditions(
+                    $conditions
+                );
+
+            $validated['actions'] =
+                $this->normalizeActions(
+                    $validated['actions'] ?? []
+                );
+
+            if ($validated['actions'] === []) {
+                abort(
+                    422,
+                    'An automatic response message is required.'
+                );
+            }
+        }
+
+        /*
+         * NEW CUSTOMER
+         */
+        elseif ($trigger === 'new_customer') {
+
+            $validated['conditions'] = [];
+
+            $validated['actions'] =
+                $this->normalizeActions(
+                    $validated['actions'] ?? []
+                );
+
+            if ($validated['actions'] === []) {
+                abort(
+                    422,
+                    'An automatic response message is required.'
+                );
+            }
+        }
+
+        /*
+         * NO REPLY / FOLLOW-UP
+         */
+        elseif ($trigger === 'no_reply') {
+
+            $conditions = $validated['conditions'] ?? [];
+
+            $first = $conditions[0] ?? [];
+
+            if (! is_array($first)) {
+                $first = [];
+            }
+
+            $delayValue = (int) (
+                $first['delay_value'] ?? 0
+            );
+
+            $delayUnit = (string) (
+                $first['delay_unit'] ?? 'hours'
+            );
+
+            if ($delayValue < 1) {
+                abort(
+                    422,
+                    'A valid follow-up delay is required.'
+                );
+            }
+
+            $validated['conditions'] = [[
+                'type' => 'delay',
+                'delay_value' => $delayValue,
+                'delay_unit' => $delayUnit,
+            ]];
+
+            $validated['actions'] =
+                $this->normalizeActions(
+                    $validated['actions'] ?? []
+                );
+
+            if ($validated['actions'] === []) {
+                abort(
+                    422,
+                    'An automatic follow-up message is required.'
+                );
+            }
+        }
+
+        $validated['is_active'] = $request->boolean(
+            'is_active'
         );
 
         return $validated;
     }
 
-    /**
-     * Keep conditions consistent with the selected trigger.
-     *
-     * @param array<int|string, mixed> $conditions
-     * @return array<int, array<string, mixed>>
-     */
-    private function normalizeConditions(
-        string $trigger,
+    private function normalizeKeywordConditions(
         array $conditions
     ): array {
-        $first = $conditions[0] ?? [];
+        $normalized = [];
 
-        if (! is_array($first)) {
-            $first = [];
+        foreach ($conditions as $condition) {
+
+            if (! is_array($condition)) {
+                continue;
+            }
+
+            $keyword = trim(
+                (string) ($condition['value'] ?? '')
+            );
+
+            $response = trim(
+                (string) ($condition['response'] ?? '')
+            );
+
+            if (
+                $keyword === ''
+                || $response === ''
+            ) {
+                continue;
+            }
+
+            $normalized[] = [
+                'type' => 'keyword',
+                'value' => $keyword,
+                'response' => $response,
+            ];
         }
 
-        return match ($trigger) {
-            'new_customer' => [],
-
-            'message_received' => $this->normalizeKeywordCondition(
-                $first
-            ),
-
-            'keyword' => $this->normalizeKeywordCondition(
-                $first
-            ),
-
-            'no_reply' => [[
-                'type' => 'delay',
-                'delay_value' => (int) ($first['delay_value'] ?? 0),
-                'delay_unit' => (string) (
-                    $first['delay_unit'] ?? 'minutes'
-                ),
-            ]],
-
-            default => [],
-        };
+        return $normalized;
     }
 
-    /**
-     * Normalize an optional keyword condition.
-     *
-     * @param array<string, mixed> $condition
-     * @return array<int, array<string, string>>
-     */
-    private function normalizeKeywordCondition(
-        array $condition
+    private function normalizeOptionalKeywordConditions(
+        array $conditions
     ): array {
-        $value = trim(
-            (string) ($condition['value'] ?? '')
-        );
+        $normalized = [];
 
-        if ($value === '') {
-            return [];
+        foreach ($conditions as $condition) {
+
+            if (! is_array($condition)) {
+                continue;
+            }
+
+            if (($condition['type'] ?? null) !== 'keyword') {
+                continue;
+            }
+
+            $keyword = trim(
+                (string) ($condition['value'] ?? '')
+            );
+
+            if ($keyword === '') {
+                continue;
+            }
+
+            $normalized[] = [
+                'type' => 'keyword',
+                'value' => $keyword,
+            ];
         }
 
-        return [[
-            'type' => 'keyword',
-            'value' => $value,
-        ]];
+        return $normalized;
+    }
+
+    private function normalizeActions(
+        array $actions
+    ): array {
+        $normalized = [];
+
+        foreach ($actions as $action) {
+
+            if (! is_array($action)) {
+                continue;
+            }
+
+            $type = (string) (
+                $action['type'] ?? ''
+            );
+
+            $message = trim(
+                (string) (
+                    $action['message'] ?? ''
+                )
+            );
+
+            if (
+                $type !== 'send_text'
+                || $message === ''
+            ) {
+                continue;
+            }
+
+            $normalized[] = [
+                'type' => 'send_text',
+                'message' => $message,
+            ];
+        }
+
+        return $normalized;
     }
 }

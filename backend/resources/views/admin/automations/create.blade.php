@@ -260,7 +260,7 @@
                             </strong>
 
                             <small>
-                                Run when a message contains a keyword.
+                                Different keywords can have different responses.
                             </small>
 
                         </span>
@@ -347,57 +347,183 @@
             </div>
 
 
+            {{-- KEYWORD CONDITIONS --}}
+
             <div
-                class="automation-rule-box"
                 id="keyword-condition"
+                class="keyword-conditions-wrapper"
             >
 
-                <div class="automation-rule-label">
-                    IF
+                <div class="keyword-condition-header">
+
+                    <div>
+                        <strong>
+                            Keyword rules
+                        </strong>
+
+                        <p>
+                            Add multiple keywords and give each keyword
+                            its own automatic response.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="automation-add-keyword-button"
+                        id="add-keyword"
+                    >
+                        <span aria-hidden="true">+</span>
+                        Add Keyword
+                    </button>
+
                 </div>
 
-                <div class="automation-field">
 
-                    <label for="condition_type">
-                        Condition
-                    </label>
+                <div
+                    id="keyword-list"
+                    class="keyword-list"
+                >
 
-                    <select
-                        id="condition_type"
-                        name="conditions[0][type]"
-                    >
+                    @php
+                        $oldConditions = old('conditions', []);
 
-                        <option value="keyword">
-                            Message contains keyword
-                        </option>
+                        $keywordConditions = collect($oldConditions)
+                            ->filter(function ($condition) {
+                                return is_array($condition)
+                                    && ($condition['type'] ?? null) === 'keyword';
+                            })
+                            ->values()
+                            ->all();
 
-                    </select>
+                        if (count($keywordConditions) === 0) {
+                            $keywordConditions = [
+                                [
+                                    'type' => 'keyword',
+                                    'value' => '',
+                                    'response' => '',
+                                ],
+                            ];
+                        }
+                    @endphp
+
+                    @foreach ($keywordConditions as $index => $condition)
+
+                        <div
+                            class="keyword-rule-card"
+                            data-keyword-row
+                        >
+
+                            <div class="keyword-rule-top">
+
+                                <div class="keyword-rule-number">
+                                    {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                                </div>
+
+                                <div class="keyword-rule-title">
+                                    Keyword Rule {{ $index + 1 }}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="keyword-remove-button"
+                                    data-remove-keyword
+                                    aria-label="Remove keyword"
+                                    {{ count($keywordConditions) === 1 ? 'disabled' : '' }}
+                                >
+                                    &times;
+                                </button>
+
+                            </div>
+
+
+                            <input
+                                type="hidden"
+                                name="conditions[{{ $index }}][type]"
+                                value="keyword"
+                            >
+
+
+                            <div class="keyword-rule-grid">
+
+                                <div class="automation-field">
+
+                                    <label>
+                                        Keyword / phrase
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="conditions[{{ $index }}][value]"
+                                        value="{{ $condition['value'] ?? '' }}"
+                                        placeholder="Example: bei"
+                                        maxlength="255"
+                                        data-keyword-input
+                                    >
+
+                                    <small>
+                                        Example: bei, godoro, delivery, warranty
+                                    </small>
+
+                                </div>
+
+
+                                <div class="automation-field">
+
+                                    <label>
+                                        Automatic response
+                                    </label>
+
+                                    <textarea
+                                        name="conditions[{{ $index }}][response]"
+                                        rows="4"
+                                        maxlength="4096"
+                                        placeholder="Example: Habari 👋 Bei za magodoro yetu zinaanzia Tsh 165,000..."
+                                        data-keyword-response
+                                    >{{ $condition['response'] ?? '' }}</textarea>
+
+                                    <small>
+                                        This exact response will be sent when
+                                        this keyword is detected.
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @endforeach
 
                 </div>
 
 
-                <div class="automation-field">
+                <div class="keyword-help-box">
 
-                    <label for="condition_value">
-                        Keyword / phrase
-                    </label>
+                    <span class="keyword-help-icon">
+                        &#128161;
+                    </span>
 
-                    <input
-                        id="condition_value"
-                        type="text"
-                        name="conditions[0][value]"
-                        value="{{ old('conditions.0.value') }}"
-                        placeholder="Example: bei"
-                    >
+                    <div>
 
-                    <small>
-                        Example: bei, godoro, delivery, size
-                    </small>
+                        <strong>
+                            How it works
+                        </strong>
+
+                        <p>
+                            Example: customer says <b>"bei"</b> → response
+                            for Bei is sent. Customer says <b>"delivery"</b>
+                            → delivery response is sent. Each keyword can
+                            have its own response.
+                        </p>
+
+                    </div>
 
                 </div>
 
             </div>
 
+
+            {{-- NEW CUSTOMER --}}
 
             <div
                 class="automation-special-info"
@@ -423,6 +549,8 @@
 
             </div>
 
+
+            {{-- NO REPLY --}}
 
             <div
                 class="automation-followup-box"
@@ -509,12 +637,43 @@
 
             </div>
 
+
+            {{-- MESSAGE RECEIVED --}}
+
+            <div
+                class="automation-message-condition-info"
+                id="message-received-condition"
+            >
+
+                <span class="automation-special-icon">
+                    &#128172;
+                </span>
+
+                <div>
+
+                    <strong>
+                        Message received
+                    </strong>
+
+                    <p>
+                        This automation can respond to every incoming
+                        customer message, or you can optionally add
+                        keyword conditions.
+                    </p>
+
+                </div>
+
+            </div>
+
         </section>
 
 
         {{-- ACTION --}}
 
-        <section class="automation-builder-card">
+        <section
+            class="automation-builder-card"
+            id="action-section"
+        >
 
             <div class="automation-builder-card-heading">
 
@@ -569,7 +728,10 @@
             </div>
 
 
-            <div class="automation-field automation-field--full">
+            <div
+                class="automation-field automation-field--full"
+                id="default-action-message"
+            >
 
                 <label for="action_message">
                     Automatic message
@@ -580,7 +742,6 @@
                     name="actions[0][message]"
                     rows="7"
                     placeholder="Example: Habari 👋 Karibu Wonder Godoro Point! Tunafurahi kukuhudumia. Unahitaji godoro la size gani?"
-                    required
                 >{{ old('actions.0.message') }}</textarea>
 
                 <small>
@@ -591,7 +752,36 @@
             </div>
 
 
-            <div class="automation-message-preview">
+            <div
+                class="keyword-action-notice"
+                id="keyword-action-notice"
+            >
+
+                <span>
+                    &#128273;
+                </span>
+
+                <div>
+
+                    <strong>
+                        Keyword responses are configured above
+                    </strong>
+
+                    <p>
+                        Each keyword already has its own automatic response.
+                        The system will send the response belonging to the
+                        keyword that matches the customer's message.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="automation-message-preview"
+                id="default-message-preview"
+            >
 
                 <div class="automation-message-preview-header">
 
@@ -962,35 +1152,176 @@
     }
 
 
-    /* CONDITIONS */
+    /* KEYWORD BUILDER */
 
-    .automation-rule-box {
-        display: grid;
-        grid-template-columns: auto repeat(2, minmax(0, 1fr));
+    .keyword-conditions-wrapper {
+        display: none;
+    }
+
+    .keyword-condition-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 20px;
-        align-items: start;
-        padding: 22px;
-        border: 1px solid rgba(185, 145, 65, 0.14);
-        border-radius: 18px;
+        margin-bottom: 18px;
+    }
+
+    .keyword-condition-header strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .keyword-condition-header p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.6;
+        opacity: 0.6;
+    }
+
+    .automation-add-keyword-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex: 0 0 auto;
+        min-height: 40px;
+        padding: 0 15px;
+        border: 1px solid rgba(185, 145, 65, 0.4);
+        border-radius: 11px;
+        background: rgba(185, 145, 65, 0.08);
+        color: inherit;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .automation-add-keyword-button span {
+        font-size: 18px;
+        line-height: 1;
+    }
+
+    .automation-add-keyword-button:hover {
+        transform: translateY(-1px);
+        border-color: rgba(185, 145, 65, 0.7);
+        background: rgba(185, 145, 65, 0.15);
+    }
+
+    .keyword-list {
+        display: grid;
+        gap: 15px;
+    }
+
+    .keyword-rule-card {
+        padding: 20px;
+        border: 1px solid rgba(185, 145, 65, 0.17);
+        border-radius: 17px;
         background: rgba(0, 0, 0, 0.08);
     }
 
-    .automation-rule-label {
+    .keyword-rule-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .keyword-rule-number {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 58px;
-        min-height: 38px;
-        padding: 0 12px;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
         border: 1px solid rgba(185, 145, 65, 0.3);
         border-radius: 10px;
         font-size: 10px;
         font-weight: 800;
-        letter-spacing: 0.12em;
     }
 
+    .keyword-rule-title {
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .keyword-remove-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        margin-left: auto;
+        border: 1px solid rgba(190, 70, 70, 0.25);
+        border-radius: 9px;
+        background: rgba(190, 70, 70, 0.05);
+        color: inherit;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .keyword-remove-button:hover:not(:disabled) {
+        background: rgba(190, 70, 70, 0.12);
+        border-color: rgba(190, 70, 70, 0.5);
+    }
+
+    .keyword-remove-button:disabled {
+        opacity: 0.2;
+        cursor: not-allowed;
+    }
+
+    .keyword-rule-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+        gap: 18px;
+    }
+
+    .keyword-help-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-top: 18px;
+        padding: 16px;
+        border: 1px solid rgba(185, 145, 65, 0.15);
+        border-radius: 14px;
+        background: rgba(185, 145, 65, 0.045);
+    }
+
+    .keyword-help-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border: 1px solid rgba(185, 145, 65, 0.25);
+        border-radius: 9px;
+    }
+
+    .keyword-help-box strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+    .keyword-help-box p {
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.65;
+        opacity: 0.6;
+    }
+
+
+    /* SPECIAL CONDITIONS */
+
     .automation-special-info,
-    .automation-followup-box {
+    .automation-followup-box,
+    .automation-message-condition-info {
         display: none;
     }
 
@@ -1016,14 +1347,16 @@
     }
 
     .automation-special-info strong,
-    .automation-followup-heading strong {
+    .automation-followup-heading strong,
+    .automation-message-condition-info strong {
         display: block;
         margin-bottom: 5px;
         font-size: 13px;
     }
 
     .automation-special-info p,
-    .automation-followup-heading p {
+    .automation-followup-heading p,
+    .automation-message-condition-info p {
         margin: 0;
         font-size: 12px;
         line-height: 1.6;
@@ -1044,6 +1377,15 @@
         margin-bottom: 20px;
     }
 
+    .automation-message-condition-info {
+        align-items: flex-start;
+        gap: 15px;
+        padding: 20px;
+        border: 1px solid rgba(185, 145, 65, 0.18);
+        border-radius: 16px;
+        background: rgba(185, 145, 65, 0.04);
+    }
+
 
     /* ACTION */
 
@@ -1057,6 +1399,41 @@
         border: 1px solid rgba(185, 145, 65, 0.14);
         border-radius: 18px;
         background: rgba(0, 0, 0, 0.08);
+    }
+
+    .keyword-action-notice {
+        display: none;
+        align-items: flex-start;
+        gap: 13px;
+        margin-bottom: 20px;
+        padding: 17px;
+        border: 1px solid rgba(185, 145, 65, 0.18);
+        border-radius: 15px;
+        background: rgba(185, 145, 65, 0.05);
+    }
+
+    .keyword-action-notice > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+        border: 1px solid rgba(185, 145, 65, 0.25);
+        border-radius: 10px;
+    }
+
+    .keyword-action-notice strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+    .keyword-action-notice p {
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.6;
+        opacity: 0.6;
     }
 
     .automation-message-preview {
@@ -1232,7 +1609,8 @@
         }
 
         .automation-field-grid,
-        .automation-trigger-grid {
+        .automation-trigger-grid,
+        .keyword-rule-grid {
             grid-template-columns: 1fr;
         }
 
@@ -1247,6 +1625,15 @@
 
         .automation-message-bubble {
             max-width: 90%;
+        }
+
+        .keyword-condition-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .automation-add-keyword-button {
+            width: 100%;
         }
     }
 
@@ -1284,6 +1671,10 @@
         .automation-secondary-button {
             width: 100%;
         }
+
+        .keyword-rule-card {
+            padding: 16px;
+        }
     }
 
 </style>
@@ -1292,6 +1683,8 @@
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.getElementById('automation-form');
 
         const triggerInputs = document.querySelectorAll(
             'input[name="trigger"]'
@@ -1306,17 +1699,220 @@
         const followupCondition =
             document.getElementById('followup-condition');
 
+        const messageReceivedCondition =
+            document.getElementById('message-received-condition');
+
         const conditionDescription =
             document.getElementById('condition-description');
 
-        const conditionValue =
-            document.getElementById('condition_value');
+        const keywordList =
+            document.getElementById('keyword-list');
+
+        const addKeywordButton =
+            document.getElementById('add-keyword');
+
+        const actionSection =
+            document.getElementById('action-section');
+
+        const defaultActionMessage =
+            document.getElementById('default-action-message');
+
+        const defaultMessagePreview =
+            document.getElementById('default-message-preview');
+
+        const keywordActionNotice =
+            document.getElementById('keyword-action-notice');
 
         const actionMessage =
             document.getElementById('action_message');
 
         const messagePreview =
             document.getElementById('message-preview');
+
+
+        function getKeywordRows() {
+
+            return keywordList.querySelectorAll(
+                '[data-keyword-row]'
+            );
+
+        }
+
+
+        function updateKeywordNumbers() {
+
+            const rows = getKeywordRows();
+
+            rows.forEach(function (row, index) {
+
+                const number =
+                    row.querySelector('.keyword-rule-number');
+
+                const title =
+                    row.querySelector('.keyword-rule-title');
+
+                const removeButton =
+                    row.querySelector('[data-remove-keyword]');
+
+                if (number) {
+                    number.textContent =
+                        String(index + 1).padStart(2, '0');
+                }
+
+                if (title) {
+                    title.textContent =
+                        'Keyword Rule ' + (index + 1);
+                }
+
+                if (removeButton) {
+                    removeButton.disabled =
+                        rows.length === 1;
+                }
+
+            });
+
+        }
+
+
+        function reindexKeywordInputs() {
+
+            const rows = getKeywordRows();
+
+            rows.forEach(function (row, index) {
+
+                const inputs =
+                    row.querySelectorAll(
+                        'input, textarea'
+                    );
+
+                inputs.forEach(function (input) {
+
+                    const name =
+                        input.getAttribute('name');
+
+                    if (! name) {
+                        return;
+                    }
+
+                    input.setAttribute(
+                        'name',
+                        name.replace(
+                            /conditions\[\d+\]/,
+                            'conditions[' + index + ']'
+                        )
+                    );
+
+                });
+
+            });
+
+        }
+
+
+        function createKeywordRow() {
+
+            const index =
+                getKeywordRows().length;
+
+            const row =
+                document.createElement('div');
+
+            row.className =
+                'keyword-rule-card';
+
+            row.setAttribute(
+                'data-keyword-row',
+                ''
+            );
+
+            row.innerHTML = `
+                <div class="keyword-rule-top">
+
+                    <div class="keyword-rule-number">
+                        ${String(index + 1).padStart(2, '0')}
+                    </div>
+
+                    <div class="keyword-rule-title">
+                        Keyword Rule ${index + 1}
+                    </div>
+
+                    <button
+                        type="button"
+                        class="keyword-remove-button"
+                        data-remove-keyword
+                        aria-label="Remove keyword"
+                    >
+                        &times;
+                    </button>
+
+                </div>
+
+                <input
+                    type="hidden"
+                    name="conditions[${index}][type]"
+                    value="keyword"
+                >
+
+                <div class="keyword-rule-grid">
+
+                    <div class="automation-field">
+
+                        <label>
+                            Keyword / phrase
+                        </label>
+
+                        <input
+                            type="text"
+                            name="conditions[${index}][value]"
+                            value=""
+                            placeholder="Example: bei"
+                            maxlength="255"
+                            data-keyword-input
+                        >
+
+                        <small>
+                            Example: bei, godoro, delivery, warranty
+                        </small>
+
+                    </div>
+
+                    <div class="automation-field">
+
+                        <label>
+                            Automatic response
+                        </label>
+
+                        <textarea
+                            name="conditions[${index}][response]"
+                            rows="4"
+                            maxlength="4096"
+                            placeholder="Example: Habari 👋 Bei za magodoro yetu zinaanzia Tsh 165,000..."
+                            data-keyword-response
+                        ></textarea>
+
+                        <small>
+                            This exact response will be sent when
+                            this keyword is detected.
+                        </small>
+
+                    </div>
+
+                </div>
+            `;
+
+            keywordList.appendChild(row);
+
+            updateKeywordNumbers();
+            reindexKeywordInputs();
+
+            const newInput =
+                row.querySelector('[data-keyword-input]');
+
+            if (newInput) {
+                newInput.focus();
+            }
+
+        }
 
 
         function updateTriggerInterface() {
@@ -1330,7 +1926,12 @@
             keywordCondition.style.display = 'none';
             welcomeCondition.style.display = 'none';
             followupCondition.style.display = 'none';
+            messageReceivedCondition.style.display = 'none';
 
+            actionSection.style.display = 'block';
+            defaultActionMessage.style.display = 'flex';
+            defaultMessagePreview.style.display = 'block';
+            keywordActionNotice.style.display = 'none';
 
             if (selectedTrigger === 'new_customer') {
 
@@ -1339,16 +1940,17 @@
                 conditionDescription.textContent =
                     'This automation runs when a customer contacts Wonder Godoro Point for the first time.';
 
-                conditionValue.removeAttribute('required');
-
             } else if (selectedTrigger === 'keyword') {
 
-                keywordCondition.style.display = 'grid';
+                keywordCondition.style.display = 'block';
 
                 conditionDescription.textContent =
-                    'The automation will respond when the customer message contains the keyword or phrase you specify.';
+                    'Add one or more keywords. Each keyword can have its own automatic response.';
 
-                conditionValue.setAttribute('required', 'required');
+                actionSection.style.display = 'block';
+                defaultActionMessage.style.display = 'none';
+                defaultMessagePreview.style.display = 'none';
+                keywordActionNotice.style.display = 'flex';
 
             } else if (selectedTrigger === 'no_reply') {
 
@@ -1357,16 +1959,13 @@
                 conditionDescription.textContent =
                     'The system will wait for the selected period before sending a follow-up when the customer has not replied.';
 
-                conditionValue.removeAttribute('required');
-
             } else {
 
-                keywordCondition.style.display = 'grid';
+                messageReceivedCondition.style.display = 'flex';
 
                 conditionDescription.textContent =
-                    'You can optionally use a keyword or phrase to control when this automation responds.';
+                    'This automation can respond whenever a customer sends a message.';
 
-                conditionValue.removeAttribute('required');
             }
 
         }
@@ -1381,7 +1980,50 @@
                 message !== ''
                     ? message
                     : 'Your automatic message will appear here.';
+
         }
+
+
+        addKeywordButton.addEventListener(
+            'click',
+            createKeywordRow
+        );
+
+
+        keywordList.addEventListener(
+            'click',
+            function (event) {
+
+                const removeButton =
+                    event.target.closest(
+                        '[data-remove-keyword]'
+                    );
+
+                if (! removeButton) {
+                    return;
+                }
+
+                const rows =
+                    getKeywordRows();
+
+                if (rows.length <= 1) {
+                    return;
+                }
+
+                const row =
+                    removeButton.closest(
+                        '[data-keyword-row]'
+                    );
+
+                if (row) {
+                    row.remove();
+                }
+
+                updateKeywordNumbers();
+                reindexKeywordInputs();
+
+            }
+        );
 
 
         triggerInputs.forEach(function (input) {
@@ -1400,6 +2042,18 @@
         );
 
 
+        form.addEventListener(
+            'submit',
+            function () {
+
+                reindexKeywordInputs();
+
+            }
+        );
+
+
+        updateKeywordNumbers();
+        reindexKeywordInputs();
         updateTriggerInterface();
         updateMessagePreview();
 
