@@ -24,9 +24,193 @@
             rel="stylesheet"
             href="{{ asset('css/inbox.css') }}"
         >
+
+        <style>
+            /* Wonder Godoro Point — premium logo loading screen */
+            #wgp-loading-screen {
+                position: fixed;
+                inset: 0;
+                z-index: 99999;
+                display: grid;
+                place-items: center;
+                background:
+                    radial-gradient(circle at 50% 42%, rgba(198, 163, 77, 0.12), transparent 32%),
+                    #171717;
+                opacity: 1;
+                visibility: visible;
+                transition:
+                    opacity 0.55s ease,
+                    visibility 0.55s ease;
+            }
+
+            #wgp-loading-screen.is-hidden {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+            .wgp-loading-inner {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 22px;
+                text-align: center;
+                padding: 32px;
+            }
+
+            .wgp-loading-logo-wrap {
+                position: relative;
+                display: grid;
+                place-items: center;
+                width: 156px;
+                height: 156px;
+            }
+
+            .wgp-loading-logo-wrap::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border: 1px solid rgba(212, 175, 82, 0.28);
+                border-radius: 50%;
+                animation: wgp-logo-ring 1.8s linear infinite;
+            }
+
+            .wgp-loading-logo-wrap::after {
+                content: "";
+                position: absolute;
+                inset: 10px;
+                border: 1px solid rgba(212, 175, 82, 0.12);
+                border-radius: 50%;
+            }
+
+            .wgp-loading-logo {
+                position: relative;
+                z-index: 2;
+                width: 116px;
+                height: 116px;
+                object-fit: contain;
+                border-radius: 22px;
+                filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.38));
+                animation: wgp-logo-breathe 1.8s ease-in-out infinite;
+            }
+
+            .wgp-loading-brand {
+                margin: 0;
+                color: #f6f0e3;
+                font-size: 1.05rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+
+            .wgp-loading-subtitle {
+                margin: -12px 0 0;
+                color: rgba(246, 240, 227, 0.62);
+                font-size: 0.78rem;
+                letter-spacing: 0.05em;
+            }
+
+            .wgp-loading-bar {
+                width: 150px;
+                height: 2px;
+                overflow: hidden;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.10);
+            }
+
+            .wgp-loading-bar span {
+                display: block;
+                width: 42%;
+                height: 100%;
+                border-radius: inherit;
+                background: linear-gradient(90deg, transparent, #d4af52, transparent);
+                animation: wgp-loading-progress 1.15s ease-in-out infinite;
+            }
+
+            @keyframes wgp-logo-ring {
+                from {
+                    transform: rotate(0deg);
+                    opacity: 0.55;
+                }
+                to {
+                    transform: rotate(360deg);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes wgp-logo-breathe {
+                0%, 100% {
+                    transform: scale(0.97);
+                }
+                50% {
+                    transform: scale(1.03);
+                }
+            }
+
+            @keyframes wgp-loading-progress {
+                from {
+                    transform: translateX(-180%);
+                }
+                to {
+                    transform: translateX(420%);
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                #wgp-loading-screen,
+                .wgp-loading-logo,
+                .wgp-loading-logo-wrap::before,
+                .wgp-loading-bar span {
+                    animation: none;
+                }
+
+                #wgp-loading-screen {
+                    transition: none;
+                }
+            }
+
+            @media (max-width: 600px) {
+                .wgp-loading-logo-wrap {
+                    width: 136px;
+                    height: 136px;
+                }
+
+                .wgp-loading-logo {
+                    width: 100px;
+                    height: 100px;
+                }
+
+                .wgp-loading-brand {
+                    font-size: 0.92rem;
+                }
+            }
+        </style>
+
     </head>
 
     <body class="inbox-page">
+
+        {{-- Premium startup splash using the current Wonder Godoro Point logo --}}
+        <div id="wgp-loading-screen" aria-label="Loading Wonder Godoro Point" role="status">
+            <div class="wgp-loading-inner">
+                <div class="wgp-loading-logo-wrap">
+                    <img
+                        class="wgp-loading-logo"
+                        src="{{ asset('img/logo.png') }}"
+                        alt="Wonder Godoro Point"
+                    >
+                </div>
+
+                <p class="wgp-loading-brand">Wonder Godoro Point</p>
+                <p class="wgp-loading-subtitle">Customer communication workspace</p>
+
+                <div class="wgp-loading-bar" aria-hidden="true">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
 
         <header class="inbox-header">
 
@@ -1246,6 +1430,40 @@
             </script>
 
         @endif
+
+
+        <script>
+            (() => {
+                const splash = document.getElementById('wgp-loading-screen');
+
+                if (!splash) {
+                    return;
+                }
+
+                const hideSplash = () => {
+                    window.requestAnimationFrame(() => {
+                        window.setTimeout(() => {
+                            splash.classList.add('is-hidden');
+
+                            window.setTimeout(() => {
+                                splash.remove();
+                            }, 650);
+                        }, 700);
+                    });
+                };
+
+                if (document.readyState === 'complete') {
+                    hideSplash();
+                } else {
+                    window.addEventListener('load', hideSplash, { once: true });
+                }
+
+                // Safety fallback: never leave the workspace behind the splash.
+                window.setTimeout(() => {
+                    splash.classList.add('is-hidden');
+                }, 4500);
+            })();
+        </script>
 
     </body>
 </html>
