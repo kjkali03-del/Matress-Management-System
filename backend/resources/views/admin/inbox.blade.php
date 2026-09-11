@@ -26,21 +26,32 @@
         >
 
         <style>
-            /* Wonder Godoro Point — premium logo loading screen */
+            /* Wonder Godoro Point — premium dark maroon startup screen */
             #wgp-loading-screen {
                 position: fixed;
                 inset: 0;
                 z-index: 99999;
                 display: grid;
                 place-items: center;
+                overflow: hidden;
                 background:
-                    radial-gradient(circle at 50% 42%, rgba(198, 163, 77, 0.12), transparent 32%),
-                    #171717;
+                    radial-gradient(circle at 50% 38%, rgba(96, 10, 18, 0.30), transparent 34%),
+                    radial-gradient(circle at 50% 100%, rgba(55, 3, 8, 0.30), transparent 48%),
+                    linear-gradient(145deg, #120003 0%, #210006 48%, #0d0002 100%);
                 opacity: 1;
                 visibility: visible;
                 transition:
-                    opacity 0.55s ease,
-                    visibility 0.55s ease;
+                    opacity 0.65s ease,
+                    visibility 0.65s ease;
+            }
+
+            #wgp-loading-screen::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                background:
+                    radial-gradient(circle at center, transparent 0 34%, rgba(0, 0, 0, 0.28) 78%, rgba(0, 0, 0, 0.52) 100%);
             }
 
             #wgp-loading-screen.is-hidden {
@@ -50,115 +61,169 @@
             }
 
             .wgp-loading-inner {
+                position: relative;
+                z-index: 1;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 22px;
-                text-align: center;
+                width: min(92vw, 620px);
+                gap: 18px;
                 padding: 32px;
+                text-align: center;
             }
 
             .wgp-loading-logo-wrap {
                 position: relative;
                 display: grid;
                 place-items: center;
-                width: 156px;
-                height: 156px;
+                width: 205px;
+                height: 205px;
+                margin-bottom: 4px;
             }
 
             .wgp-loading-logo-wrap::before {
                 content: "";
                 position: absolute;
-                inset: 0;
-                border: 1px solid rgba(212, 175, 82, 0.28);
+                inset: 3px;
+                border: 2px solid rgba(212, 175, 82, 0.92);
                 border-radius: 50%;
-                animation: wgp-logo-ring 1.8s linear infinite;
+                box-shadow:
+                    0 0 18px rgba(212, 175, 82, 0.20),
+                    0 0 42px rgba(126, 7, 20, 0.26);
+                animation: wgp-gold-ring 2.8s linear infinite;
             }
 
             .wgp-loading-logo-wrap::after {
                 content: "";
                 position: absolute;
-                inset: 10px;
-                border: 1px solid rgba(212, 175, 82, 0.12);
+                inset: 11px;
+                border: 1px solid rgba(212, 175, 82, 0.26);
                 border-radius: 50%;
             }
 
             .wgp-loading-logo {
                 position: relative;
                 z-index: 2;
-                width: 116px;
-                height: 116px;
+                display: block;
+                width: 174px;
+                height: 174px;
                 object-fit: contain;
-                border-radius: 22px;
-                filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.38));
-                animation: wgp-logo-breathe 1.8s ease-in-out infinite;
+                border-radius: 50%;
+                filter:
+                    drop-shadow(0 16px 30px rgba(0, 0, 0, 0.48))
+                    drop-shadow(0 0 16px rgba(212, 175, 82, 0.16));
+                animation: wgp-logo-breathe 1.9s ease-in-out infinite;
             }
 
             .wgp-loading-brand {
-                margin: 0;
-                color: #f6f0e3;
-                font-size: 1.05rem;
+                margin: 2px 0 0;
+                color: #e9bd4e;
+                font-family: Georgia, "Times New Roman", serif;
+                font-size: clamp(1.65rem, 4vw, 2.45rem);
                 font-weight: 700;
-                letter-spacing: 0.08em;
+                line-height: 1.02;
+                letter-spacing: 0.055em;
                 text-transform: uppercase;
+                text-shadow: 0 3px 18px rgba(0, 0, 0, 0.55);
             }
 
             .wgp-loading-subtitle {
-                margin: -12px 0 0;
-                color: rgba(246, 240, 227, 0.62);
-                font-size: 0.78rem;
-                letter-spacing: 0.05em;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                margin: 0;
+                color: #f3eee2;
+                font-size: clamp(0.82rem, 2vw, 1rem);
+                font-weight: 400;
+                letter-spacing: 0.18em;
+            }
+
+            .wgp-loading-subtitle::before,
+            .wgp-loading-subtitle::after {
+                content: "";
+                width: 56px;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, #d4af52);
+            }
+
+            .wgp-loading-subtitle::after {
+                background: linear-gradient(90deg, #d4af52, transparent);
+            }
+
+            .wgp-loading-workspace {
+                margin: 4px 0 2px;
+                color: rgba(246, 240, 227, 0.58);
+                font-size: 0.68rem;
+                letter-spacing: 0.24em;
+                text-transform: uppercase;
             }
 
             .wgp-loading-bar {
-                width: 150px;
-                height: 2px;
+                position: relative;
+                width: min(72vw, 430px);
+                height: 5px;
+                margin-top: 14px;
                 overflow: hidden;
+                border: 1px solid rgba(212, 175, 82, 0.52);
                 border-radius: 999px;
-                background: rgba(255, 255, 255, 0.10);
+                background: rgba(0, 0, 0, 0.38);
+                box-shadow:
+                    0 0 12px rgba(212, 175, 82, 0.08),
+                    inset 0 1px 2px rgba(0, 0, 0, 0.45);
             }
 
             .wgp-loading-bar span {
                 display: block;
-                width: 42%;
+                width: 46%;
                 height: 100%;
                 border-radius: inherit;
-                background: linear-gradient(90deg, transparent, #d4af52, transparent);
-                animation: wgp-loading-progress 1.15s ease-in-out infinite;
+                background: linear-gradient(90deg, #9b6711, #ffe8a0, #d4af52);
+                box-shadow:
+                    0 0 10px rgba(255, 211, 93, 0.72),
+                    0 0 24px rgba(212, 175, 82, 0.34);
+                animation: wgp-loading-progress 1.35s ease-in-out infinite;
             }
 
-            @keyframes wgp-logo-ring {
+            .wgp-loading-label {
+                margin: 2px 0 0;
+                color: rgba(238, 211, 137, 0.88);
+                font-size: 0.68rem;
+                letter-spacing: 0.36em;
+                text-transform: uppercase;
+            }
+
+            @keyframes wgp-gold-ring {
                 from {
                     transform: rotate(0deg);
-                    opacity: 0.55;
                 }
                 to {
                     transform: rotate(360deg);
-                    opacity: 1;
                 }
             }
 
             @keyframes wgp-logo-breathe {
                 0%, 100% {
-                    transform: scale(0.97);
+                    transform: scale(0.985);
                 }
                 50% {
-                    transform: scale(1.03);
+                    transform: scale(1.02);
                 }
             }
 
             @keyframes wgp-loading-progress {
-                from {
-                    transform: translateX(-180%);
+                0% {
+                    transform: translateX(-115%);
                 }
-                to {
-                    transform: translateX(420%);
+                50% {
+                    transform: translateX(115%);
+                }
+                100% {
+                    transform: translateX(260%);
                 }
             }
 
             @media (prefers-reduced-motion: reduce) {
-                #wgp-loading-screen,
                 .wgp-loading-logo,
                 .wgp-loading-logo-wrap::before,
                 .wgp-loading-bar span {
@@ -171,18 +236,47 @@
             }
 
             @media (max-width: 600px) {
+                .wgp-loading-inner {
+                    gap: 15px;
+                    padding: 24px;
+                }
+
                 .wgp-loading-logo-wrap {
-                    width: 136px;
-                    height: 136px;
+                    width: 170px;
+                    height: 170px;
                 }
 
                 .wgp-loading-logo {
-                    width: 100px;
-                    height: 100px;
+                    width: 144px;
+                    height: 144px;
+                }
+
+                .wgp-loading-logo-wrap::before {
+                    inset: 2px;
+                }
+
+                .wgp-loading-logo-wrap::after {
+                    inset: 9px;
                 }
 
                 .wgp-loading-brand {
-                    font-size: 0.92rem;
+                    font-size: 1.45rem;
+                }
+
+                .wgp-loading-subtitle {
+                    gap: 9px;
+                    font-size: 0.72rem;
+                    letter-spacing: 0.12em;
+                }
+
+                .wgp-loading-subtitle::before,
+                .wgp-loading-subtitle::after {
+                    width: 30px;
+                }
+
+                .wgp-loading-workspace {
+                    font-size: 0.57rem;
+                    letter-spacing: 0.17em;
                 }
             }
         </style>
@@ -203,11 +297,16 @@
                 </div>
 
                 <p class="wgp-loading-brand">Wonder Godoro Point</p>
-                <p class="wgp-loading-subtitle">Customer communication workspace</p>
+
+                <p class="wgp-loading-subtitle">Mattress Shop</p>
+
+                <p class="wgp-loading-workspace">Customer Communication Workspace</p>
 
                 <div class="wgp-loading-bar" aria-hidden="true">
                     <span></span>
                 </div>
+
+                <p class="wgp-loading-label">Loading...</p>
             </div>
         </div>
 
