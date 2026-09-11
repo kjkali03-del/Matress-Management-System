@@ -1886,3 +1886,570 @@ textarea:disabled {
         scroll-behavior: auto !important;
     }
 }
+/* =========================================================
+   WONDER GODORO POINT — BRAND SYSTEM v2
+   Deep Maroon + Luxury Gold + Warm Ivory
+   Aligned with the new circular logo / loading creative.
+   Existing Inbox structure and functionality are preserved.
+   ========================================================= */
+
+:root {
+    --wgp-maroon-950: #160004;
+    --wgp-maroon-900: #210006;
+    --wgp-maroon-800: #320009;
+    --wgp-maroon-700: #4a0b12;
+    --wgp-maroon-600: #64131b;
+    --wgp-maroon-500: #7d1b24;
+
+    --wgp-gold-700: #8f641c;
+    --wgp-gold-600: #b88a2d;
+    --wgp-gold-500: #d4af52;
+    --wgp-gold-400: #e6c56a;
+    --wgp-gold-300: #f2d98c;
+
+    --wgp-ivory-50: #fffdf8;
+    --wgp-ivory-100: #faf6ee;
+    --wgp-ivory-200: #f3ece0;
+    --wgp-ivory-300: #e9dfd0;
+
+    --wgp-ink: #241b1b;
+    --wgp-muted: #766c68;
+    --wgp-success: #2f704b;
+    --wgp-danger: #a43e3e;
+
+    --inbox-bg: #f3eee7;
+    --inbox-surface: var(--wgp-ivory-50);
+    --inbox-line: #e5dbcd;
+    --inbox-ink: var(--wgp-ink);
+    --inbox-muted: var(--wgp-muted);
+    --inbox-accent: var(--wgp-gold-600);
+    --inbox-accent-dark: var(--wgp-gold-700);
+    --inbox-inbound: #f2eadf;
+    --inbox-selected: #f8efe0;
+    --inbox-composer: #fffaf3;
+    --inbox-success: var(--wgp-success);
+    --inbox-danger: var(--wgp-danger);
+    --inbox-white: #ffffff;
+
+    --wgp-gold-glow: 0 0 0 1px rgba(212, 175, 82, 0.20), 0 8px 24px rgba(212, 175, 82, 0.10);
+    --wgp-maroon-shadow: 0 10px 30px rgba(33, 0, 6, 0.14);
+}
+
+/* ---------- Global brand atmosphere ---------- */
+
+body.inbox-page {
+    background:
+        radial-gradient(circle at 5% 0%, rgba(212, 175, 82, 0.07), transparent 24rem),
+        radial-gradient(circle at 95% 100%, rgba(100, 19, 27, 0.08), transparent 28rem),
+        var(--inbox-bg);
+    color: var(--inbox-ink);
+}
+
+/* ---------- Header / brand bar ---------- */
+
+.inbox-header {
+    background:
+        linear-gradient(135deg, var(--wgp-maroon-900), var(--wgp-maroon-800));
+    border-bottom: 1px solid rgba(212, 175, 82, 0.35);
+    box-shadow:
+        0 8px 28px rgba(33, 0, 6, 0.18),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.admin-brand {
+    color: #fffaf0;
+}
+
+.admin-brand img {
+    filter:
+        drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35))
+        drop-shadow(0 0 10px rgba(212, 175, 82, 0.14));
+}
+
+.admin-brand span {
+    color: var(--wgp-gold-300);
+}
+
+.inbox-user {
+    color: rgba(255, 250, 240, 0.72);
+}
+
+.admin-logout {
+    background: transparent;
+    border-color: rgba(212, 175, 82, 0.48);
+    color: var(--wgp-gold-300);
+}
+
+.admin-logout:hover {
+    background: var(--wgp-gold-500);
+    border-color: var(--wgp-gold-500);
+    color: var(--wgp-maroon-950);
+}
+
+/* ---------- Main workspace frame ---------- */
+
+.inbox-shell {
+    background: var(--wgp-ivory-50);
+    border-color: rgba(100, 19, 27, 0.16);
+    box-shadow:
+        0 20px 55px rgba(33, 0, 6, 0.11),
+        0 0 0 1px rgba(212, 175, 82, 0.06);
+}
+
+.conversation-panel,
+.customer-profile-panel {
+    background: rgba(255, 253, 248, 0.98);
+}
+
+.conversation-panel + .conversation-panel,
+.customer-profile-panel {
+    border-color: #e4d9ca;
+}
+
+/* ---------- Inbox panel heading ---------- */
+
+.panel-heading,
+.conversation-detail-header {
+    background:
+        linear-gradient(180deg, #fffdf8 0%, #f9f3e9 100%);
+    border-bottom-color: #e4d9ca;
+}
+
+.panel-heading {
+    position: relative;
+}
+
+.panel-heading::after {
+    background: linear-gradient(90deg, var(--wgp-gold-500), transparent);
+    bottom: -1px;
+    content: "";
+    height: 2px;
+    left: 0;
+    position: absolute;
+    width: 42%;
+}
+
+.panel-heading h1 {
+    color: var(--wgp-maroon-800);
+}
+
+.panel-heading .auth-kicker,
+.customer-profile-kicker {
+    color: var(--wgp-gold-700);
+}
+
+.conversation-count {
+    background: var(--wgp-maroon-800);
+    color: var(--wgp-gold-300);
+    box-shadow: var(--wgp-maroon-shadow);
+}
+
+/* ---------- Search ---------- */
+
+.conversation-search {
+    background: #fbf7f0;
+    border-bottom-color: #e5dbcd;
+}
+
+.conversation-search input[type="search"] {
+    background: #f5eee4;
+    border-color: #dfd3c4;
+    color: var(--wgp-ink);
+}
+
+.conversation-search input[type="search"]:focus {
+    border-color: var(--wgp-gold-500);
+    box-shadow: 0 0 0 3px rgba(212, 175, 82, 0.14);
+}
+
+.conversation-search-button {
+    background: var(--wgp-maroon-800);
+    border-color: var(--wgp-maroon-800);
+    color: var(--wgp-gold-300);
+}
+
+.conversation-search-button:hover {
+    background: var(--wgp-maroon-600);
+    border-color: var(--wgp-maroon-600);
+    color: #fffaf0;
+}
+
+.conversation-search-clear:hover {
+    background: var(--wgp-ivory-200);
+    color: var(--wgp-maroon-700);
+}
+
+/* ---------- Conversation list ---------- */
+
+.conversation-item {
+    border-bottom-color: #eee5d9;
+}
+
+.conversation-item:hover {
+    background: #fcf7ef;
+}
+
+.conversation-item.is-selected {
+    background:
+        linear-gradient(90deg, #f8eddb 0%, #fffaf2 75%);
+}
+
+.conversation-item.is-selected::before {
+    background: linear-gradient(180deg, var(--wgp-gold-400), var(--wgp-gold-700));
+    box-shadow: 0 0 10px rgba(212, 175, 82, 0.20);
+}
+
+.conversation-avatar {
+    background:
+        linear-gradient(145deg, #f4e5c8, #ead7b6);
+    border-color: rgba(212, 175, 82, 0.30);
+    color: var(--wgp-maroon-700);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+        0 4px 12px rgba(33, 0, 6, 0.07);
+}
+
+.conversation-topline strong {
+    color: var(--wgp-maroon-900);
+}
+
+.conversation-phone {
+    color: #837770;
+}
+
+.conversation-preview {
+    color: #665b57;
+}
+
+.unread-badge {
+    background: var(--wgp-maroon-700);
+    color: var(--wgp-gold-300);
+    box-shadow:
+        0 4px 12px rgba(100, 19, 27, 0.22),
+        0 0 0 1px rgba(212, 175, 82, 0.18);
+}
+
+/* ---------- Active conversation header ---------- */
+
+.customer-heading h2 {
+    color: var(--wgp-maroon-900);
+}
+
+.channel-label {
+    border-left-color: #dfd3c4;
+    color: var(--wgp-gold-700);
+}
+
+.status-pill {
+    background: #faf5ec;
+    border-color: #dfd3c4;
+    color: #786d66;
+}
+
+.status-pill--open {
+    background: #edf7ef;
+    border-color: #c4ddca;
+    color: var(--wgp-success);
+}
+
+/* ---------- Message area ---------- */
+
+.message-stream {
+    background:
+        radial-gradient(circle at 50% 0%, rgba(212, 175, 82, 0.06), transparent 30rem),
+        linear-gradient(180deg, #f5f0e8 0%, #f0e9df 100%);
+}
+
+.message-day-label {
+    color: var(--wgp-gold-700);
+}
+
+/* Incoming/customer message */
+
+.message-row:not(.message-row--outbound) .message-bubble {
+    background: #fffdf8;
+    border-color: #e5dbcd;
+    box-shadow:
+        0 4px 16px rgba(33, 0, 6, 0.045),
+        0 0 0 1px rgba(212, 175, 82, 0.025);
+}
+
+.message-row:not(.message-row--outbound) .message-bubble::before {
+    background: var(--wgp-gold-500);
+    border-radius: 50%;
+    content: "";
+    height: 5px;
+    left: 10px;
+    position: absolute;
+    top: 10px;
+    width: 5px;
+}
+
+/* Outgoing/admin message */
+
+.message-row--outbound .message-bubble {
+    background:
+        linear-gradient(145deg, var(--wgp-maroon-800), var(--wgp-maroon-900));
+    border-color: var(--wgp-maroon-800);
+    box-shadow:
+        0 8px 22px rgba(33, 0, 6, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.045);
+    color: #fff9ed;
+}
+
+.message-row--outbound .message-bubble time {
+    color: rgba(246, 229, 193, 0.66);
+}
+
+/* ---------- Media / location ---------- */
+
+.message-media {
+    box-shadow: 0 8px 24px rgba(33, 0, 6, 0.11);
+}
+
+.message-location {
+    background: #fffaf2;
+    border-color: #e1d6c7;
+}
+
+.message-location-icon {
+    background: #f0dfbf;
+    color: var(--wgp-maroon-700);
+}
+
+.message-location a {
+    color: var(--wgp-maroon-600);
+}
+
+.message-row--outbound .message-location {
+    background: rgba(255, 250, 242, 0.08);
+    border-color: rgba(242, 217, 140, 0.22);
+}
+
+.message-row--outbound .message-location-icon {
+    background: rgba(212, 175, 82, 0.18);
+    color: var(--wgp-gold-300);
+}
+
+/* ---------- Composer ---------- */
+
+.message-composer {
+    background:
+        linear-gradient(180deg, #fffaf3 0%, #f8f0e4 100%);
+    border-top-color: #e0d4c4;
+    box-shadow: 0 -10px 28px rgba(33, 0, 6, 0.055);
+}
+
+.message-composer textarea {
+    background: #fffdf8;
+    border-color: #dfd3c4;
+}
+
+.message-composer textarea:focus {
+    border-color: var(--wgp-gold-500);
+    box-shadow: 0 0 0 3px rgba(212, 175, 82, 0.14);
+}
+
+.composer-tool-button {
+    background: #fffaf2;
+    border-color: #dfd3c4;
+    color: var(--wgp-maroon-700);
+}
+
+.composer-tool-button:hover {
+    background: #f3e4cb;
+    border-color: var(--wgp-gold-500);
+    color: var(--wgp-maroon-900);
+}
+
+.send-button {
+    background:
+        linear-gradient(135deg, var(--wgp-gold-500), var(--wgp-gold-700));
+    border: 1px solid rgba(143, 100, 28, 0.28);
+    box-shadow:
+        0 8px 18px rgba(143, 100, 28, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    color: var(--wgp-maroon-950);
+}
+
+.send-button:hover {
+    background:
+        linear-gradient(135deg, var(--wgp-gold-400), var(--wgp-gold-600));
+    color: var(--wgp-maroon-950);
+}
+
+/* ---------- Customer profile ---------- */
+
+.customer-profile-panel {
+    box-shadow: -10px 0 28px rgba(33, 0, 6, 0.045);
+}
+
+.customer-profile-header {
+    background:
+        linear-gradient(180deg, var(--wgp-maroon-900), var(--wgp-maroon-800));
+    border-bottom-color: rgba(212, 175, 82, 0.28);
+}
+
+.customer-profile-kicker {
+    color: var(--wgp-gold-300);
+}
+
+.customer-profile-title {
+    color: #fff8eb;
+}
+
+.customer-profile-body {
+    background: #fffdf8;
+}
+
+.customer-profile-identity {
+    background: #faf2e5;
+    border-color: #e6d8c5;
+}
+
+.customer-profile-name {
+    color: var(--wgp-maroon-900);
+}
+
+.customer-profile-section {
+    border-top-color: #e9dfd1;
+}
+
+.customer-profile-section h3 {
+    color: var(--wgp-maroon-700);
+}
+
+.customer-notes,
+.customer-notes-form textarea {
+    background: #f8f1e7;
+    border-color: #dfd3c4;
+}
+
+.customer-notes-form textarea:focus {
+    background: #fffdf8;
+    border-color: var(--wgp-gold-500);
+    box-shadow: 0 0 0 3px rgba(212, 175, 82, 0.12);
+}
+
+.customer-notes-save {
+    background: var(--wgp-maroon-800);
+    color: var(--wgp-gold-300);
+}
+
+.customer-notes-save:hover {
+    background: var(--wgp-maroon-600);
+}
+
+.customer-notes-download {
+    color: var(--wgp-gold-700);
+}
+
+/* ---------- Empty states ---------- */
+
+.empty-mark {
+    background: #faf1e2;
+    border-color: #dfd2c0;
+    color: var(--wgp-maroon-700);
+    box-shadow: 0 8px 24px rgba(33, 0, 6, 0.06);
+}
+
+.inbox-empty h2 {
+    color: var(--wgp-maroon-800);
+}
+
+/* ---------- Call icon — ready for the Calls feature ---------- */
+/*
+   These selectors intentionally cover the call icon naming variants
+   we can use when the Calls UI is introduced. The current Inbox does
+   not yet contain a call control, so this does not alter functionality.
+*/
+
+.incoming-call-icon,
+.call-icon,
+.whatsapp-call-icon,
+[data-call-icon],
+[data-action="call"] {
+    align-items: center;
+    background:
+        linear-gradient(145deg, var(--wgp-maroon-800), var(--wgp-maroon-950));
+    border: 1px solid rgba(212, 175, 82, 0.58);
+    border-radius: 50%;
+    box-shadow:
+        0 6px 16px rgba(33, 0, 6, 0.20),
+        0 0 0 3px rgba(212, 175, 82, 0.08);
+    color: var(--wgp-gold-300);
+    display: inline-flex;
+    justify-content: center;
+    transition:
+        transform 160ms ease,
+        box-shadow 160ms ease,
+        background 160ms ease;
+}
+
+.incoming-call-icon:hover,
+.call-icon:hover,
+.whatsapp-call-icon:hover,
+[data-call-icon]:hover,
+[data-action="call"]:hover {
+    background:
+        linear-gradient(145deg, var(--wgp-gold-500), var(--wgp-gold-700));
+    box-shadow:
+        0 8px 20px rgba(143, 100, 28, 0.24),
+        0 0 0 4px rgba(212, 175, 82, 0.12);
+    color: var(--wgp-maroon-950);
+    transform: translateY(-1px);
+}
+
+/* Incoming call alert state — gold pulse on maroon */
+.incoming-call-icon.is-incoming,
+.incoming-call-icon.incoming,
+.call-icon.is-incoming,
+[data-call-icon].is-incoming {
+    animation: wgp-incoming-call-pulse 1.45s ease-in-out infinite;
+    border-color: var(--wgp-gold-400);
+}
+
+@keyframes wgp-incoming-call-pulse {
+    0%, 100% {
+        box-shadow:
+            0 6px 16px rgba(33, 0, 6, 0.20),
+            0 0 0 3px rgba(212, 175, 82, 0.08);
+    }
+    50% {
+        box-shadow:
+            0 8px 22px rgba(143, 100, 28, 0.25),
+            0 0 0 8px rgba(212, 175, 82, 0.12);
+    }
+}
+
+/* ---------- Accessibility / focus ---------- */
+
+.send-button:focus-visible,
+.admin-logout:focus-visible,
+.conversation-item:focus-visible,
+.conversation-search-button:focus-visible,
+.conversation-search-clear:focus-visible,
+.composer-tool-button:focus-visible,
+.incoming-call-icon:focus-visible,
+.call-icon:focus-visible {
+    outline: 2px solid var(--wgp-gold-500);
+    outline-offset: 3px;
+}
+
+/* ---------- Mobile brand treatment ---------- */
+
+@media (max-width: 760px) {
+    .inbox-header {
+        background:
+            linear-gradient(135deg, var(--wgp-maroon-900), var(--wgp-maroon-700));
+    }
+
+    .panel-heading::after {
+        width: 55%;
+    }
+
+    .message-row--outbound .message-bubble {
+        background:
+            linear-gradient(145deg, var(--wgp-maroon-800), var(--wgp-maroon-900));
+    }
+}
