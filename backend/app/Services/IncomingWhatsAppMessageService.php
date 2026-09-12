@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\NewWhatsAppMessage;
 use App\Models\Call;
 use App\Models\Conversation;
 use App\Models\Customer;
@@ -59,6 +60,12 @@ class IncomingWhatsAppMessageService
                         $this->automationService->handleIncomingMessage(
                             $message
                         );
+
+                        /*
+                         * Broadcast the new WhatsApp message to the
+                         * administrator workspace in real time.
+                         */
+                        NewWhatsAppMessage::dispatch($message);
 
                         $processed++;
                     } catch (UniqueConstraintViolationException $exception) {
