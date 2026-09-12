@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Order;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -59,6 +60,28 @@ class CustomerController extends Controller
             },
         ]);
 
+        $orders = Order::query()
+            ->where('customer_id', $customer->id)
+            ->latest('ordered_at')
+            ->latest('id')
+            ->get();
+
+        $orderSummary = [
+            'total_orders' => $orders->count(),
+
+            'pending_orders' => $orders
+                ->where('status', 'pending')
+                ->count(),
+
+            'completed_orders' => $orders
+                ->where('status', 'completed')
+                ->count(),
+
+            'total_sales' => $orders
+                ->where('payment_status', 'paid')
+                ->sum('total_amount'),
+        ];
+
         $tags = Tag::query()
             ->orderBy('name')
             ->get();
@@ -69,6 +92,8 @@ class CustomerController extends Controller
 
         return view('admin.customers.show', [
             'customer' => $customer,
+            'orders' => $orders,
+            'orderSummary' => $orderSummary,
             'tags' => $tags,
             'users' => $users,
         ]);

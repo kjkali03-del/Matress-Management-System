@@ -36,10 +36,11 @@ class CustomerNotesTest extends TestCase
             ]
         );
 
-        $response
-            ->assertRedirect(route('admin.inbox', [
+        $response->assertRedirect(
+            route('admin.inbox', [
                 'conversation' => $conversation->id,
-            ]));
+            ])
+        );
 
         $response->assertSessionHas(
             'notes_status',
@@ -65,18 +66,29 @@ class CustomerNotesTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)->get(
-            route('admin.inbox.customers.notes.download', $customer)
+            route(
+                'admin.inbox.customers.notes.download',
+                $customer
+            )
         );
 
         $response->assertOk();
-        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+
+        $response->assertHeader(
+            'Content-Type',
+            'text/plain; charset=UTF-8'
+        );
+
         $response->assertHeader(
             'Content-Disposition',
             'attachment; filename="Maya-Customer-notes.txt"'
         );
+
         $response->assertSeeText('WONDER GODORO POINT');
         $response->assertSeeText('Maya Customer');
         $response->assertSeeText('+255700000001');
-        $response->assertSeeText('Customer wants delivery in Dar es Salaam.');
+        $response->assertSeeText(
+            'Customer wants delivery in Dar es Salaam.'
+        );
     }
 }

@@ -28,16 +28,20 @@
 
         <nav class="dashboard-nav" aria-label="Admin navigation">
 
-            <p class="dashboard-nav-label">Workspace</p>
+            <p class="dashboard-nav-label">
+                Workspace
+            </p>
 
+            {{-- Overview --}}
             <a
-                class="dashboard-nav-item {{ request()->routeIs('admin') ? 'is-active' : '' }}"
+                class="dashboard-nav-item {{ request()->routeIs('admin') || request()->routeIs('admin.dashboard') ? 'is-active' : '' }}"
                 href="{{ route('admin') }}"
             >
                 <span class="nav-icon" aria-hidden="true">&#9632;</span>
                 <span>Overview</span>
             </a>
 
+            {{-- Customer Inbox --}}
             <a
                 class="dashboard-nav-item {{ request()->routeIs('admin.inbox*') ? 'is-active' : '' }}"
                 href="{{ route('admin.inbox') }}"
@@ -51,6 +55,7 @@
                 Business
             </p>
 
+            {{-- Products --}}
             <a
                 class="dashboard-nav-item {{ request()->routeIs('admin.products*') ? 'is-active' : '' }}"
                 href="{{ route('admin.products.index') }}"
@@ -60,6 +65,7 @@
                 <span class="nav-state">Open</span>
             </a>
 
+            {{-- Customers --}}
             <a
                 class="dashboard-nav-item {{ request()->routeIs('admin.customers*') ? 'is-active' : '' }}"
                 href="{{ route('admin.customers.index') }}"
@@ -69,29 +75,45 @@
                 <span class="nav-state">Open</span>
             </a>
 
-            <span class="dashboard-nav-item is-disabled" aria-disabled="true">
+            {{-- Orders --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.orders*') ? 'is-active' : '' }}"
+                href="{{ route('admin.orders.index') }}"
+            >
                 <span class="nav-icon" aria-hidden="true">&#9675;</span>
                 <span>Orders</span>
-                <span class="nav-state">Soon</span>
-            </span>
+                <span class="nav-state">Open</span>
+            </a>
 
-            <span class="dashboard-nav-item is-disabled" aria-disabled="true">
+            {{-- Delivery --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.delivery*') ? 'is-active' : '' }}"
+                href="{{ route('admin.delivery.index') }}"
+            >
                 <span class="nav-icon" aria-hidden="true">&#9675;</span>
                 <span>Delivery</span>
-                <span class="nav-state">Soon</span>
-            </span>
+                <span class="nav-state">Open</span>
+            </a>
 
-            <span class="dashboard-nav-item is-disabled" aria-disabled="true">
+            {{-- Reports --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.reports*') ? 'is-active' : '' }}"
+                href="{{ route('admin.reports.index') }}"
+            >
                 <span class="nav-icon" aria-hidden="true">&#9675;</span>
                 <span>Reports</span>
-                <span class="nav-state">Soon</span>
-            </span>
+                <span class="nav-state">Open</span>
+            </a>
 
-            <span class="dashboard-nav-item is-disabled" aria-disabled="true">
+            {{-- Settings --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.settings*') ? 'is-active' : '' }}"
+                href="{{ route('admin.settings.index') }}"
+            >
                 <span class="nav-icon" aria-hidden="true">&#9675;</span>
                 <span>Settings</span>
-                <span class="nav-state">Soon</span>
-            </span>
+                <span class="nav-state">Open</span>
+            </a>
 
         </nav>
 
@@ -106,7 +128,10 @@
                 <small>Administrator</small>
             </span>
 
-            <form method="POST" action="{{ route('logout') }}">
+            <form
+                method="POST"
+                action="{{ route('logout') }}"
+            >
                 @csrf
 
                 <button

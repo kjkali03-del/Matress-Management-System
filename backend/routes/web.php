@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AutomationController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\InboxController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PipelineController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Auth\LoginController;
@@ -26,12 +28,6 @@ Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-/*
-|--------------------------------------------------------------------------
-| Admin
-|--------------------------------------------------------------------------
-*/
-
 Route::get('/admin', function () {
     return view('admin.dashboard');
 })
@@ -43,29 +39,16 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Dashboard
-        |--------------------------------------------------------------------------
-        */
-
         Route::get('/dashboard', function () {
             return view('admin.dashboard');
         })->name('dashboard');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Inbox
-        |--------------------------------------------------------------------------
-        */
-
+        // Inbox
         Route::get('/inbox', [InboxController::class, 'index'])
             ->name('inbox');
 
-        Route::get(
-            '/inbox/{conversation}/messages',
-            [InboxController::class, 'messages']
-        )->name('inbox.messages');
+        Route::get('/inbox/{conversation}/messages', [InboxController::class, 'messages'])
+            ->name('inbox.messages');
 
         Route::post(
             '/inbox/{conversation}/messages',
@@ -92,12 +75,7 @@ Route::middleware(['auth', 'admin'])
             [InboxController::class, 'destroyMessage']
         )->name('inbox.messages.destroy');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Customer Notes
-        |--------------------------------------------------------------------------
-        */
-
+        // Customer notes
         Route::patch(
             '/inbox/customers/{customer}/notes',
             [InboxController::class, 'updateCustomerNotes']
@@ -108,82 +86,67 @@ Route::middleware(['auth', 'admin'])
             [InboxController::class, 'downloadCustomerNotes']
         )->name('inbox.customers.notes.download');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Customer Notes - Backward Compatibility
-        |--------------------------------------------------------------------------
-        */
-
-        Route::patch(
+        // Backward-compatible customer notes route
+        Route::post(
             '/customers/{customer}/notes',
             [InboxController::class, 'updateCustomerNotes']
         )->name('customers.notes.update');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Customers
-        |--------------------------------------------------------------------------
-        */
+        // Customers
+        Route::get('/customers', [CustomerController::class, 'index'])
+            ->name('customers.index');
 
-        Route::get(
-            '/customers',
-            [CustomerController::class, 'index']
-        )->name('customers.index');
+        Route::get('/customers/{customer}', [CustomerController::class, 'show'])
+            ->name('customers.show');
 
-        Route::get(
-            '/customers/{customer}',
-            [CustomerController::class, 'show']
-        )->name('customers.show');
+        Route::put('/customers/{customer}', [CustomerController::class, 'update'])
+            ->name('customers.update');
 
-        Route::put(
-            '/customers/{customer}',
-            [CustomerController::class, 'update']
-        )->name('customers.update');
+        // Sales Pipeline
+        Route::get('/pipeline', [PipelineController::class, 'index'])
+            ->name('pipeline.index');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Tags
-        |--------------------------------------------------------------------------
-        */
+        Route::patch(
+            '/pipeline/customers/{customer}/status',
+            [PipelineController::class, 'updateStatus']
+        )->name('pipeline.customers.status.update');
 
-        Route::get(
-            '/tags',
-            [TagController::class, 'index']
-        )->name('tags.index');
+        // Tags
+        Route::get('/tags', [TagController::class, 'index'])
+            ->name('tags.index');
 
-        Route::post(
-            '/tags',
-            [TagController::class, 'store']
-        )->name('tags.store');
+        Route::post('/tags', [TagController::class, 'store'])
+            ->name('tags.store');
 
-        Route::put(
-            '/tags/{tag}',
-            [TagController::class, 'update']
-        )->name('tags.update');
+        Route::put('/tags/{tag}', [TagController::class, 'update'])
+            ->name('tags.update');
 
-        Route::delete(
-            '/tags/{tag}',
-            [TagController::class, 'destroy']
-        )->name('tags.destroy');
+        Route::delete('/tags/{tag}', [TagController::class, 'destroy'])
+            ->name('tags.destroy');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Products
-        |--------------------------------------------------------------------------
-        */
-
+        // Products
         Route::resource('products', ProductController::class);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Automations
-        |--------------------------------------------------------------------------
-        */
+        // Orders
+        Route::resource('orders', OrderController::class);
 
-        Route::resource(
-            'automations',
-            AutomationController::class
-        );
+        // Delivery
+        Route::get('/delivery', function () {
+            return view('admin.dashboard');
+        })->name('delivery.index');
+
+        // Reports
+        Route::get('/reports', function () {
+            return view('admin.dashboard');
+        })->name('reports.index');
+
+        // Settings
+        Route::get('/settings', function () {
+            return view('admin.dashboard');
+        })->name('settings.index');
+
+        // Automations
+        Route::resource('automations', AutomationController::class);
 
         Route::post(
             '/automations/{automation}/toggle',
@@ -191,12 +154,7 @@ Route::middleware(['auth', 'admin'])
         )->name('automations.toggle');
     });
 
-/*
-|--------------------------------------------------------------------------
-| WhatsApp Webhook
-|--------------------------------------------------------------------------
-*/
-
+// WhatsApp Webhook
 Route::get(
     '/webhooks/whatsapp',
     [WhatsAppWebhookController::class, 'verify']
