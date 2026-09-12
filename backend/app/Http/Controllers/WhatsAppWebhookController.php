@@ -11,14 +11,22 @@ use Illuminate\Support\Facades\Validator;
 
 class WhatsAppWebhookController extends Controller
 {
-    public function __construct(private readonly IncomingWhatsAppMessageService $messageService) {}
+    public function __construct(
+        private readonly IncomingWhatsAppMessageService $messageService
+    ) {}
 
     public function verify(Request $request): Response
     {
         $validated = Validator::make([
             'mode' => $request->query('hub.mode', $request->query('hub_mode')),
-            'verify_token' => $request->query('hub.verify_token', $request->query('hub_verify_token')),
-            'challenge' => $request->query('hub.challenge', $request->query('hub_challenge')),
+            'verify_token' => $request->query(
+                'hub.verify_token',
+                $request->query('hub_verify_token')
+            ),
+            'challenge' => $request->query(
+                'hub.challenge',
+                $request->query('hub_challenge')
+            ),
         ], [
             'mode' => ['required', 'string'],
             'verify_token' => ['required', 'string'],
@@ -27,17 +35,24 @@ class WhatsAppWebhookController extends Controller
 
         abort_unless(
             $validated['mode'] === 'subscribe'
-                && hash_equals((string) config('services.whatsapp.verify_token'), $validated['verify_token']),
+                && hash_equals(
+                    (string) config('services.whatsapp.verify_token'),
+                    $validated['verify_token']
+                ),
             403,
         );
 
         return response($validated['challenge']);
     }
 
-    public function receive(Request $request): JsonResponse
+    public function handle(Request $request): JsonResponse
     {
         $payload = $request->validate([
-            'object' => ['required', 'string', 'in:whatsapp_business_account'],
+            'object' => [
+                'required',
+                'string',
+                'in:whatsapp_business_account',
+            ],
             'entry' => ['required', 'array'],
         ]);
 
@@ -45,6 +60,13 @@ class WhatsAppWebhookController extends Controller
 
         Log::info('WhatsApp webhook processed.', $result);
 
-        return response()->json(['received' => true]);
+        return response()->json([
+            'received' => true,
+        ]);
+    }
+
+    public function receive(Request $request): JsonResponse
+    {
+        return $this->handle($request);
     }
 }

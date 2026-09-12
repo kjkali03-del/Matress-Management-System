@@ -60,11 +60,14 @@
                 <span class="nav-state">Open</span>
             </a>
 
-            <span class="dashboard-nav-item is-disabled" aria-disabled="true">
-                <span class="nav-icon" aria-hidden="true">&#9675;</span>
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.customers*') ? 'is-active' : '' }}"
+                href="{{ route('admin.customers.index') }}"
+            >
+                <span class="nav-icon" aria-hidden="true">&#9823;</span>
                 <span>Customers</span>
-                <span class="nav-state">Soon</span>
-            </span>
+                <span class="nav-state">Open</span>
+            </a>
 
             <span class="dashboard-nav-item is-disabled" aria-disabled="true">
                 <span class="nav-icon" aria-hidden="true">&#9675;</span>

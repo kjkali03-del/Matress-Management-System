@@ -1,116 +1,210 @@
 <?php
 
 use App\Http\Controllers\Admin\AutomationController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\InboxController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Http\Middleware\VerifyMetaWebhookSignature;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('admin')
-        : redirect()->route('login');
+    return redirect()->route('login');
 });
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'create'])
-        ->name('login');
+Route::get('/login', [LoginController::class, 'create'])
+    ->middleware('guest')
+    ->name('login');
 
-    Route::post('/login', [LoginController::class, 'store'])
-        ->name('login.store');
-});
+Route::post('/login', [LoginController::class, 'store'])
+    ->middleware('guest')
+    ->name('login.store');
 
-Route::middleware('auth')->group(function () {
+Route::post('/logout', [LoginController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
 
-    Route::post('/logout', [LoginController::class, 'destroy'])
-        ->name('logout');
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
 
-    Route::middleware('admin')
-        ->get('/admin', function () {
+Route::get('/admin', function () {
+    return view('admin.dashboard');
+})
+    ->middleware(['auth', 'admin'])
+    ->name('admin');
+
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/dashboard', function () {
             return view('admin.dashboard');
-        })
-        ->name('admin');
+        })->name('dashboard');
 
-    Route::middleware(['admin'])
-        ->prefix('admin')
-        ->name('admin.')
-        ->group(function () {
+        /*
+        |--------------------------------------------------------------------------
+        | Inbox
+        |--------------------------------------------------------------------------
+        */
 
-            Route::get('/inbox', [InboxController::class, 'index'])
-                ->name('inbox');
+        Route::get('/inbox', [InboxController::class, 'index'])
+            ->name('inbox');
 
-            Route::get(
-                '/inbox/{conversation}/messages',
-                [InboxController::class, 'messages']
-            )->name('inbox.messages');
+        Route::get(
+            '/inbox/{conversation}/messages',
+            [InboxController::class, 'messages']
+        )->name('inbox.messages');
 
-            Route::post(
-                '/inbox/{conversation}/messages',
-                [InboxController::class, 'store']
-            )->name('inbox.messages.store');
+        Route::post(
+            '/inbox/{conversation}/messages',
+            [InboxController::class, 'store']
+        )->name('inbox.messages.store');
 
-            Route::post(
-                '/inbox/{conversation}/media/image',
-                [InboxController::class, 'sendImage']
-            )->name('inbox.messages.image');
+        Route::post(
+            '/inbox/{conversation}/image',
+            [InboxController::class, 'sendImage']
+        )->name('inbox.messages.image');
 
-            Route::post(
-                '/inbox/{conversation}/media/video',
-                [InboxController::class, 'sendVideo']
-            )->name('inbox.messages.video');
+        Route::post(
+            '/inbox/{conversation}/video',
+            [InboxController::class, 'sendVideo']
+        )->name('inbox.messages.video');
 
-            Route::post(
-                '/inbox/{conversation}/location',
-                [InboxController::class, 'sendLocation']
-            )->name('inbox.messages.location');
+        Route::post(
+            '/inbox/{conversation}/location',
+            [InboxController::class, 'sendLocation']
+        )->name('inbox.messages.location');
 
-            Route::delete(
-                '/inbox/messages/{message}',
-                [InboxController::class, 'destroyMessage']
-            )->name('inbox.messages.destroy');
+        Route::delete(
+            '/inbox/messages/{message}',
+            [InboxController::class, 'destroyMessage']
+        )->name('inbox.messages.destroy');
 
-            Route::patch(
-                '/inbox/customers/{customer}/notes',
-                [InboxController::class, 'updateCustomerNotes']
-            )->name('inbox.customers.notes.update');
+        /*
+        |--------------------------------------------------------------------------
+        | Customer Notes
+        |--------------------------------------------------------------------------
+        */
 
-            Route::get(
-                '/inbox/customers/{customer}/notes/download',
-                [InboxController::class, 'downloadCustomerNotes']
-            )->name('inbox.customers.notes.download');
+        Route::patch(
+            '/inbox/customers/{customer}/notes',
+            [InboxController::class, 'updateCustomerNotes']
+        )->name('inbox.customers.notes.update');
 
-            Route::resource('products', ProductController::class);
+        Route::get(
+            '/inbox/customers/{customer}/notes/download',
+            [InboxController::class, 'downloadCustomerNotes']
+        )->name('inbox.customers.notes.download');
 
-            /*
-             * Automation
-             */
-            Route::resource('automations', AutomationController::class);
+        /*
+        |--------------------------------------------------------------------------
+        | Customer Notes - Backward Compatibility
+        |--------------------------------------------------------------------------
+        */
 
-            Route::patch(
-                '/automations/{automation}/toggle',
-                [AutomationController::class, 'toggle']
-            )->name('automations.toggle');
-        });
-});
+        Route::patch(
+            '/customers/{customer}/notes',
+            [InboxController::class, 'updateCustomerNotes']
+        )->name('customers.notes.update');
 
-Route::prefix('webhooks/whatsapp')->group(function () {
-    Route::get('/', [WhatsAppWebhookController::class, 'verify'])
-        ->withoutMiddleware([
-            ValidateCsrfToken::class,
-            'auth',
-            'admin',
-        ])
-        ->name('whatsapp.webhook.verify');
+        /*
+        |--------------------------------------------------------------------------
+        | Customers
+        |--------------------------------------------------------------------------
+        */
 
-    Route::post('/', [WhatsAppWebhookController::class, 'receive'])
-        ->withoutMiddleware([
-            ValidateCsrfToken::class,
-            'auth',
-            'admin',
-        ])
-        ->middleware(VerifyMetaWebhookSignature::class)
-        ->name('whatsapp.webhook.receive');
-});
+        Route::get(
+            '/customers',
+            [CustomerController::class, 'index']
+        )->name('customers.index');
+
+        Route::get(
+            '/customers/{customer}',
+            [CustomerController::class, 'show']
+        )->name('customers.show');
+
+        Route::put(
+            '/customers/{customer}',
+            [CustomerController::class, 'update']
+        )->name('customers.update');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Tags
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/tags',
+            [TagController::class, 'index']
+        )->name('tags.index');
+
+        Route::post(
+            '/tags',
+            [TagController::class, 'store']
+        )->name('tags.store');
+
+        Route::put(
+            '/tags/{tag}',
+            [TagController::class, 'update']
+        )->name('tags.update');
+
+        Route::delete(
+            '/tags/{tag}',
+            [TagController::class, 'destroy']
+        )->name('tags.destroy');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Products
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource('products', ProductController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Automations
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource(
+            'automations',
+            AutomationController::class
+        );
+
+        Route::post(
+            '/automations/{automation}/toggle',
+            [AutomationController::class, 'toggle']
+        )->name('automations.toggle');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| WhatsApp Webhook
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/webhooks/whatsapp',
+    [WhatsAppWebhookController::class, 'verify']
+)->name('webhooks.whatsapp.verify');
+
+Route::post(
+    '/webhooks/whatsapp',
+    [WhatsAppWebhookController::class, 'handle']
+)
+    ->middleware(VerifyMetaWebhookSignature::class)
+    ->name('webhooks.whatsapp.handle');

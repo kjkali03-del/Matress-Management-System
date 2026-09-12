@@ -127,6 +127,10 @@ class IncomingWhatsAppMessageService
                 ],
             );
 
+            $customer->update([
+                'last_contact_at' => now(),
+            ]);
+
             $conversation = Conversation::firstOrCreate(
                 [
                     'customer_id' => $customer->id,

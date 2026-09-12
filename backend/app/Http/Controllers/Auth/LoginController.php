@@ -26,7 +26,9 @@ class LoginController extends Controller
             'remember' => ['nullable', 'boolean'],
         ]);
 
-        $throttleKey = Str::transliterate(Str::lower($request->string('email')).'|'.$request->ip());
+        $throttleKey = Str::transliterate(
+            Str::lower($request->string('email')) . '|' . $request->ip()
+        );
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
