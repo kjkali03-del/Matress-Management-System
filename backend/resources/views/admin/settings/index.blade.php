@@ -1,0 +1,10 @@
+@extends('layouts.admin')
+@section('title', 'Settings | Wonder Godoro Point')
+@push('styles')
+<style>
+.settings-page{max-width:1000px;margin:0 auto;padding:32px}.settings-page h1{margin:0;font-size:32px}.settings-page>p{color:#737373}.settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:22px}.settings-card{background:#fff;border:1px solid #e7e2d9;border-radius:14px;padding:20px}.settings-card h2{margin:0 0 8px;font-size:17px}.settings-card p{margin:0;color:#777;font-size:13px}.settings-status{display:inline-block;margin-top:14px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700}.ok{background:#e7f7ec;color:#176b35}.warn{background:#fff4db;color:#875d00}.settings-note{margin-top:18px;padding:15px;background:#f7f5ef;border-radius:10px;color:#665f54;font-size:13px}@media(max-width:700px){.settings-page{padding:20px 14px}.settings-grid{grid-template-columns:1fr}}
+</style>
+@endpush
+@section('content')
+<div class="settings-page"><h1>Settings</h1><p>System configuration and integration health. Secrets remain in the environment configuration.</p><div class="settings-grid"><div class="settings-card"><h2>WhatsApp Cloud API</h2><p>Webhook and outbound messaging configuration.</p><span class="settings-status {{ $whatsappConfigured?'ok':'warn' }}">{{ $whatsappConfigured?'Configured':'Needs configuration' }}</span></div><div class="settings-card"><h2>Real-time / Reverb</h2><p>Live inbox and browser notifications.</p><span class="settings-status {{ $reverbConfigured?'ok':'warn' }}">{{ $reverbConfigured?'Configured':'Needs configuration' }}</span></div><div class="settings-card"><h2>Queue</h2><p>Used for delayed automation and background work.</p><span class="settings-status ok">{{ $queueConnection }}</span></div><div class="settings-card"><h2>Database</h2><p>Primary persistence layer.</p><span class="settings-status ok">{{ $databaseConnection }}</span></div></div><div class="settings-note"><strong>Deployment note:</strong> update the backend <code>.env</code> for WhatsApp, database, queue and Reverb credentials, then run migrations and clear the Laravel cache.</div></div>
+@endsection

@@ -20,11 +20,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
     'status',
     'last_contact_at',
     'assigned_to',
+    'lead_source',
+    'district',
+    'area',
+    'next_follow_up_at',
 ])]
 class Customer extends Model
 {
     /** @use HasFactory<CustomerFactory> */
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return ['next_follow_up_at' => 'datetime'];
+    }
 
     public function conversations(): HasMany
     {

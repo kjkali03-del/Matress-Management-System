@@ -56,3 +56,21 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## October 2026 upgrade
+
+The application now follows the expanded business flow documented in `docs/system-flowchart.mmd`.
+
+### New/expanded modules
+
+- Product cost, stock, SKU and reorder tracking
+- Catalogue-linked orders
+- Delivery assignment and delivery workflow
+- Business reports and estimated COGS/gross profit
+- Settings/integration health
+- Incoming WhatsApp media/location message storage
+- WhatsApp sent/delivered/read/failed status updates
+- Automation execution logging
+- Scheduled no-reply follow-ups
+
+See `docs/UPGRADE_NOTES.md` for migration and deployment notes.
