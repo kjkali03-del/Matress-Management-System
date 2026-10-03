@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -103,6 +105,8 @@ class OrderController extends Controller
 
         return view('admin.orders.create', [
             'customers' => $customers,
+            'products' => Product::where('is_active', true)->orderBy('name')->orderBy('size')->get(),
+            'drivers' => User::orderBy('name')->get(),
         ]);
     }
 
@@ -110,6 +114,7 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'product_name' => ['required', 'string', 'max:255'],
             'product_size' => ['nullable', 'string', 'max:100'],
             'quantity' => ['required', 'integer', 'min:1'],
@@ -126,10 +131,22 @@ class OrderController extends Controller
                 'required',
                 'in:pending,processing,delivered,cancelled',
             ],
+            'delivery_assigned_to' => ['nullable', 'integer', 'exists:users,id'],
+            'delivery_area' => ['nullable', 'string', 'max:255'],
+            'delivery_notes' => ['nullable', 'string', 'max:5000'],
             'delivery_address' => ['nullable', 'string', 'max:5000'],
             'notes' => ['nullable', 'string', 'max:10000'],
             'ordered_at' => ['nullable', 'date'],
         ]);
+
+        if (! empty($validated['product_id'])) {
+            $product = Product::find($validated['product_id']);
+            if ($product) {
+                $validated['product_name'] = $product->name;
+                $validated['product_size'] = $product->size;
+                $validated['unit_price'] = $validated['unit_price'] ?? $product->price;
+            }
+        }
 
         $validated['total_amount'] =
             (float) $validated['quantity'] *
@@ -162,6 +179,8 @@ class OrderController extends Controller
         return view('admin.orders.edit', [
             'order' => $order,
             'customers' => $customers,
+            'products' => Product::where('is_active', true)->orderBy('name')->orderBy('size')->get(),
+            'drivers' => User::orderBy('name')->get(),
         ]);
     }
 
@@ -171,6 +190,7 @@ class OrderController extends Controller
     ): RedirectResponse {
         $validated = $request->validate([
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'product_name' => ['required', 'string', 'max:255'],
             'product_size' => ['nullable', 'string', 'max:100'],
             'quantity' => ['required', 'integer', 'min:1'],
@@ -187,10 +207,22 @@ class OrderController extends Controller
                 'required',
                 'in:pending,processing,delivered,cancelled',
             ],
+            'delivery_assigned_to' => ['nullable', 'integer', 'exists:users,id'],
+            'delivery_area' => ['nullable', 'string', 'max:255'],
+            'delivery_notes' => ['nullable', 'string', 'max:5000'],
             'delivery_address' => ['nullable', 'string', 'max:5000'],
             'notes' => ['nullable', 'string', 'max:10000'],
             'ordered_at' => ['nullable', 'date'],
         ]);
+
+        if (! empty($validated['product_id'])) {
+            $product = Product::find($validated['product_id']);
+            if ($product) {
+                $validated['product_name'] = $product->name;
+                $validated['product_size'] = $product->size;
+                $validated['unit_price'] = $validated['unit_price'] ?? $product->price;
+            }
+        }
 
         $validated['total_amount'] =
             (float) $validated['quantity'] *

@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Admin\AutomationController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\DeliveryController;
+use App\Http\Controllers\Admin\ReportsController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\InboxController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PipelineController;
@@ -131,19 +134,15 @@ Route::middleware(['auth', 'admin'])
         Route::resource('orders', OrderController::class);
 
         // Delivery
-        Route::get('/delivery', function () {
-            return view('admin.dashboard');
-        })->name('delivery.index');
+        Route::get('/delivery', [DeliveryController::class, 'index'])->name('delivery.index');
+        Route::patch('/delivery/orders/{order}', [DeliveryController::class, 'update'])->name('delivery.orders.update');
 
         // Reports
-        Route::get('/reports', function () {
-            return view('admin.dashboard');
-        })->name('reports.index');
+        Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
 
         // Settings
-        Route::get('/settings', function () {
-            return view('admin.dashboard');
-        })->name('settings.index');
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
         // Automations
         Route::resource('automations', AutomationController::class);

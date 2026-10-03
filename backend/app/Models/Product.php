@@ -13,14 +13,21 @@ class Product extends Model
     protected $fillable = [
         'product_category_id',
         'name',
+        'sku',
         'size',
         'price',
+        'cost_price',
+        'stock_quantity',
+        'reorder_level',
         'description',
         'is_active',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
+        'stock_quantity' => 'integer',
+        'reorder_level' => 'integer',
         'is_active' => 'boolean',
     ];
 

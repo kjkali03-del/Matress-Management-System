@@ -27,11 +27,14 @@ class IncomingWhatsAppMessageService
             foreach ($entry['changes'] ?? [] as $change) {
                 $value = $change['value'] ?? [];
 
+                foreach ($value['statuses'] ?? [] as $status) {
+                    if ($this->storeMessageStatus($status)) {
+                        $processed++;
+                    }
+                }
+
                 foreach ($value['messages'] ?? [] as $incoming) {
-                    if (
-                        ($incoming['type'] ?? null) !== 'text'
-                        || blank($incoming['id'] ?? null)
-                    ) {
+                    if (blank($incoming['id'] ?? null)) {
                         continue;
                     }
 
@@ -44,7 +47,7 @@ class IncomingWhatsAppMessageService
                     }
 
                     try {
-                        $message = $this->storeTextMessage(
+                        $message = $this->storeIncomingMessage(
                             $incoming,
                             $value['contacts'] ?? [],
                         );
@@ -104,7 +107,44 @@ class IncomingWhatsAppMessageService
         return compact('processed', 'duplicates');
     }
 
-    private function storeTextMessage(
+    private function storeMessageStatus(array $status): bool
+    {
+        $providerMessageId = (string) ($status['id'] ?? '');
+        if ($providerMessageId === '') {
+            return false;
+        }
+
+        $message = Message::where('provider_message_id', $providerMessageId)->first();
+        if (! $message) {
+            return false;
+        }
+
+        $state = strtolower((string) ($status['status'] ?? ''));
+        $attributes = [
+            'status' => match ($state) {
+                'sent' => 'sent',
+                'delivered' => 'delivered',
+                'read' => 'read',
+                'failed' => 'failed',
+                default => $message->status,
+            },
+        ];
+
+        if ($state === 'read') {
+            $attributes['read_at'] = now();
+        }
+
+        if ($state === 'failed') {
+            $attributes['failed_at'] = now();
+            $attributes['error_code'] = (string) (data_get($status, 'errors.0.code') ?? '');
+            $attributes['error_message'] = (string) (data_get($status, 'errors.0.title') ?? data_get($status, 'errors.0.message') ?? 'WhatsApp message failed.');
+        }
+
+        $message->update($attributes);
+        return true;
+    }
+
+    private function storeIncomingMessage(
         array $incoming,
         array $contacts
     ): Message {
@@ -147,14 +187,20 @@ class IncomingWhatsAppMessageService
             );
 
             $createdAt = now();
+            $type = (string) ($incoming['type'] ?? 'text');
+            $body = $this->resolveIncomingBody($incoming, $type);
+            $media = $this->resolveIncomingMedia($incoming, $type);
+            $location = $this->resolveIncomingLocation($incoming, $type);
 
             $message = $conversation->messages()->create([
                 'direction' => 'inbound',
-                'message_type' => 'text',
-                'body' => data_get($incoming, 'text.body'),
+                'message_type' => $type,
+                'body' => $body,
                 'provider_message_id' => $incoming['id'],
                 'status' => 'delivered',
                 'sent_at' => $createdAt,
+                ...$media,
+                ...$location,
             ]);
 
             $conversation->update([
@@ -163,6 +209,57 @@ class IncomingWhatsAppMessageService
 
             return $message;
         });
+    }
+
+
+    private function resolveIncomingBody(array $incoming, string $type): ?string
+    {
+        return match ($type) {
+            'text' => data_get($incoming, 'text.body'),
+            'image' => data_get($incoming, 'image.caption'),
+            'video' => data_get($incoming, 'video.caption'),
+            'document' => data_get($incoming, 'document.caption'),
+            'audio' => 'Audio message',
+            'location' => data_get($incoming, 'location.name')
+                ?? data_get($incoming, 'location.address')
+                ?? 'Shared location',
+            'interactive' => data_get($incoming, 'interactive.button_reply.title')
+                ?? data_get($incoming, 'interactive.list_reply.title')
+                ?? 'Interactive reply',
+            'button' => data_get($incoming, 'button.text'),
+            default => 'Incoming WhatsApp message',
+        };
+    }
+
+    /** @return array<string, mixed> */
+    private function resolveIncomingMedia(array $incoming, string $type): array
+    {
+        $media = data_get($incoming, $type, []);
+        if (! is_array($media) || ! in_array($type, ['image', 'video', 'audio', 'document'], true)) {
+            return [];
+        }
+
+        return [
+            'media_id' => data_get($media, 'id'),
+            'media_mime_type' => data_get($media, 'mime_type'),
+            'media_filename' => data_get($media, 'filename'),
+            'media_caption' => data_get($media, 'caption'),
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function resolveIncomingLocation(array $incoming, string $type): array
+    {
+        if ($type !== 'location') {
+            return [];
+        }
+
+        return [
+            'latitude' => data_get($incoming, 'location.latitude'),
+            'longitude' => data_get($incoming, 'location.longitude'),
+            'location_name' => data_get($incoming, 'location.name'),
+            'location_address' => data_get($incoming, 'location.address'),
+        ];
     }
 
     private function storeCall(

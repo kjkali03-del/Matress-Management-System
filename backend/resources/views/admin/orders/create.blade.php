@@ -110,6 +110,18 @@
                     </select>
                 </div>
 
+                <div class="order-group order-group-full">
+                    <label for="product_id">Product from catalogue</label>
+                    <select id="product_id" name="product_id">
+                        <option value="">Manual product entry</option>
+                        @foreach($products as $product)
+                            <option value="{{ $product->id }}" @selected(old('product_id', $order->product_id ?? '') == $product->id)>
+                                {{ $product->name }}{{ $product->size ? ' — '.$product->size : '' }} — TSh {{ number_format($product->price,0) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="order-group">
                     <label for="product_name">Product <span>*</span></label>
                     <input
@@ -196,6 +208,21 @@
                         name="ordered_at"
                         value="{{ old('ordered_at') }}"
                     >
+                </div>
+
+                <div class="order-group">
+                    <label for="delivery_area">Delivery Area</label>
+                    <input type="text" id="delivery_area" name="delivery_area" value="{{ old('delivery_area', $order->delivery_area ?? '') }}" placeholder="e.g. Sinza, Mikocheni">
+                </div>
+
+                <div class="order-group">
+                    <label for="delivery_assigned_to">Assign delivery</label>
+                    <select id="delivery_assigned_to" name="delivery_assigned_to">
+                        <option value="">Unassigned</option>
+                        @foreach($drivers as $driver)
+                            <option value="{{ $driver->id }}" @selected(old('delivery_assigned_to', $order->delivery_assigned_to ?? '') == $driver->id)>{{ $driver->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="order-group order-group-full">
