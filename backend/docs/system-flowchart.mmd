@@ -1,0 +1,51 @@
+flowchart TD
+    A([START]) --> B[/Customer sends WhatsApp message/]
+    B --> C[Receive WhatsApp webhook]
+    C --> D{Signature valid?}
+    D -- No --> E[Reject request / 403]
+    E --> Z([END])
+    D -- Yes --> F[Store webhook event / process message]
+    F --> G{Customer exists?}
+    G -- No --> H[Create customer]
+    G -- Yes --> I[Load customer]
+    H --> J[Create / open conversation]
+    I --> J
+    J --> K[Store message + media/location]
+    K --> L[Update conversation + customer activity]
+    L --> M[Run automation rules]
+    M --> N{Matching automation?}
+    N -- Yes --> O[Execute action / schedule follow-up]
+    N -- No --> P[Notify staff]
+    O --> Q[Broadcast real-time update]
+    P --> Q
+    Q --> R[Admin sees message in Inbox]
+    R --> S{Admin needs to respond?}
+    S -- Yes --> T[Compose text / media / location]
+    T --> U[Send through WhatsApp Cloud API]
+    U --> V{Sent successfully?}
+    V -- No --> W[Mark failed + allow retry]
+    W --> R
+    V -- Yes --> X[Track sent → delivered → read]
+    X --> Y{Sales action?}
+    Y -- No --> Z
+    Y -- Yes --> AA[Update CRM / pipeline]
+    AA --> AB[Create / update order]
+    AB --> AC[Assign delivery]
+    AC --> AD[Processing → Out for delivery → Delivered]
+    AD --> AE[Reports / revenue / COGS / performance]
+    AE --> Z
+
+    subgraph ADMIN[Admin Web Application]
+        R
+        T
+        AA
+        AB
+        AC
+        AE
+    end
+
+    subgraph AUTOMATION[Automation Engine]
+        M
+        N
+        O
+    end

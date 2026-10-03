@@ -32,6 +32,7 @@
                             <th>Category</th>
                             <th>Size</th>
                             <th>Price</th>
+                            <th>Stock</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -62,6 +63,14 @@
 
                                 <td>
                                     TSh {{ number_format((float) $product->price, 0) }}
+                                    @if($product->cost_price > 0)<div class="product-description">Cost: TSh {{ number_format((float) $product->cost_price, 0) }}</div>@endif
+                                </td>
+
+                                <td>
+                                    {{ $product->stock_quantity }}
+                                    @if($product->stock_quantity <= $product->reorder_level)
+                                        <div class="product-description">Reorder</div>
+                                    @endif
                                 </td>
 
                                 <td>

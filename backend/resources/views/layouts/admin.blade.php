@@ -67,6 +67,16 @@
                 <span class="nav-state">Open</span>
             </a>
 
+            {{-- Pipeline --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.pipeline*') ? 'is-active' : '' }}"
+                href="{{ route('admin.pipeline.index') }}"
+            >
+                <span class="nav-icon" aria-hidden="true">&#8594;</span>
+                <span>Pipeline</span>
+                <span class="nav-state">Open</span>
+            </a>
+
             {{-- Customers --}}
             <a
                 class="dashboard-nav-item {{ request()->routeIs('admin.customers*') ? 'is-active' : '' }}"
@@ -84,6 +94,26 @@
             >
                 <span class="nav-icon" aria-hidden="true">&#9675;</span>
                 <span>Orders</span>
+                <span class="nav-state">Open</span>
+            </a>
+
+            {{-- Automations --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.automations*') ? 'is-active' : '' }}"
+                href="{{ route('admin.automations.index') }}"
+            >
+                <span class="nav-icon" aria-hidden="true">&#9881;</span>
+                <span>Automations</span>
+                <span class="nav-state">Open</span>
+            </a>
+
+            {{-- Tags --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.tags*') ? 'is-active' : '' }}"
+                href="{{ route('admin.tags.index') }}"
+            >
+                <span class="nav-icon" aria-hidden="true">#</span>
+                <span>Tags</span>
                 <span class="nav-state">Open</span>
             </a>
 

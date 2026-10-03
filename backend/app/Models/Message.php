@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'status',
     'sent_at',
     'read_at',
+    'failed_at',
+    'error_code',
+    'error_message',
     'media_id',
     'media_url',
     'media_mime_type',
@@ -37,6 +40,7 @@ class Message extends Model
         return [
             'sent_at' => 'datetime',
             'read_at' => 'datetime',
+            'failed_at' => 'datetime',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];

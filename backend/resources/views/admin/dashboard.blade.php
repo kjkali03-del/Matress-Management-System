@@ -6,33 +6,28 @@
 
 @php
     use App\Models\Customer;
+    use App\Models\Conversation;
+    use App\Models\Message;
+    use App\Models\Order;
+    use App\Models\Product;
 
     $totalCustomers = Customer::count();
-
     $newCustomers = Customer::where('status', 'new')->count();
-
     $contactedCustomers = Customer::where('status', 'contacted')->count();
-
     $interestedCustomers = Customer::where('status', 'interested')->count();
-
     $negotiatingCustomers = Customer::where('status', 'negotiating')->count();
-
     $wonCustomers = Customer::where('status', 'won')->count();
-
     $lostCustomers = Customer::where('status', 'lost')->count();
+    $pipelineTotal = $newCustomers + $contactedCustomers + $interestedCustomers + $negotiatingCustomers + $wonCustomers;
 
-    $pipelineTotal = $newCustomers
-        + $contactedCustomers
-        + $interestedCustomers
-        + $negotiatingCustomers
-        + $wonCustomers;
+    $todayOrders = Order::whereDate('ordered_at', today())->count();
+    $todayRevenue = Order::whereDate('ordered_at', today())->where('payment_status', 'paid')->sum('total_amount');
+    $pendingDeliveries = Order::whereIn('delivery_status', ['pending', 'processing'])->count();
+    $unreadMessages = Message::where('direction', 'inbound')->whereNull('read_at')->count();
+    $lowStockProducts = Product::where('is_active', true)->whereColumn('stock_quantity', '<=', 'reorder_level')->count();
+    $openConversations = Conversation::where('status', 'open')->count();
 
-    $recentCustomers = Customer::query()
-        ->with('tags')
-        ->latest('last_contact_at')
-        ->latest('id')
-        ->limit(6)
-        ->get();
+    $recentCustomers = Customer::query()->with('tags')->latest('last_contact_at')->latest('id')->limit(6)->get();
 @endphp
 
 <header class="dashboard-topbar">
@@ -78,6 +73,16 @@
         Open Customer Inbox
         <span aria-hidden="true">&rarr;</span>
     </a>
+</section>
+
+{{-- Business KPIs --}}
+<section class="dashboard-module-section" aria-labelledby="business-kpis-heading" style="margin-top:32px;">
+    <div class="dashboard-section-heading"><div><p class="dashboard-section-kicker">Business Operations</p><h2 id="business-kpis-heading">Today at a glance</h2></div><a class="dashboard-module-count" href="{{ route('admin.reports.index') }}" style="text-decoration:none;">Open reports →</a></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-top:20px;">
+        @foreach([['Today Orders',$todayOrders,route('admin.orders.index')],['Today Revenue','TSh '.number_format($todayRevenue,0),route('admin.reports.index')],['Pending Delivery',$pendingDeliveries,route('admin.delivery.index')],['Unread Messages',$unreadMessages,route('admin.inbox')],['Open Conversations',$openConversations,route('admin.inbox')],['Low Stock',$lowStockProducts,route('admin.products.index')]] as $metric)
+            <a href="{{ $metric[2] }}" style="text-decoration:none;color:inherit;padding:20px;border:1px solid rgba(0,0,0,.08);border-radius:16px;background:#fff;box-shadow:0 8px 25px rgba(0,0,0,.04);"><span style="font-size:13px;opacity:.65;">{{ $metric[0] }}</span><strong style="display:block;margin-top:8px;font-size:25px;">{{ $metric[1] }}</strong></a>
+        @endforeach
+    </div>
 </section>
 
 {{-- CRM Statistics --}}
