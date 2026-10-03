@@ -14,6 +14,7 @@ if [ "${APP_ENV:-production}" = "production" ] && [ "${DB_CONNECTION:-}" != "pgs
 fi
 
 php artisan package:discover --ansi >/dev/null
+php artisan storage:link >/dev/null 2>&1 || true
 
 php artisan migrate --force
 

@@ -37,3 +37,8 @@ The distributable project intentionally excludes the local `.env` file. Copy `.e
 ## Important compatibility note
 
 Existing order fields (`product_name`, `product_size`, `unit_price`) remain in place. The new `product_id` relationship is optional so existing historical orders remain valid.
+
+## Admin UI CSS pass
+
+Added `public/css/admin-ui.css` and loaded it from `resources/views/layouts/admin.blade.php`.
+The shared visual layer standardizes the admin sidebar, content width, page headings, cards, tables, forms, buttons, customer tables, product empty states, reports and settings while preserving the existing Blade markup and functionality.

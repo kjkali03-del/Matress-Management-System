@@ -36,6 +36,18 @@
         <label for="reorder_level">Reorder level</label>
         <input id="reorder_level" type="number" min="0" name="reorder_level" value="{{ old('reorder_level', $product->reorder_level ?? 0) }}">
     </div>
+
+    <div class="product-field product-field--full wgp-product-image-field">
+        <label for="image">Product image</label>
+        <label class="wgp-image-drop" for="image">
+            <input id="image" type="file" name="image" accept="image/jpeg,image/png,image/webp" data-image-preview-input>
+            <span class="wgp-image-preview" data-image-preview>
+                @if(isset($product) && !empty($product->image_path))<img src="{{ asset('storage/'.$product->image_path) }}" alt="{{ $product->name }}">@else<span class="wgp-image-placeholder">＋<small>Upload product image</small></span>@endif
+            </span>
+            <span><strong>Upload product image</strong><small>JPG, PNG or WebP · max 5 MB</small></span>
+        </label>
+    </div>
+
     <div class="product-field product-field--full">
         <label for="description">Description</label>
         <textarea id="description" name="description" rows="5">{{ old('description', $product->description ?? '') }}</textarea>

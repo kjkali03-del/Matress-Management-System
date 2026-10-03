@@ -20,6 +20,7 @@ class Product extends Model
         'stock_quantity',
         'reorder_level',
         'description',
+        'image_path',
         'is_active',
     ];
 

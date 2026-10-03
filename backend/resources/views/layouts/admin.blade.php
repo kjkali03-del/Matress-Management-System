@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-ui.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/wgp-premium.css') }}">
 
     @vite('resources/js/app.js')
 
@@ -183,12 +184,32 @@
 
     <main class="dashboard-main">
 
+        <header class="wgp-appbar">
+            <button class="wgp-mobile-menu" type="button" aria-label="Open navigation" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="wgp-search" role="search">
+                <span aria-hidden="true">⌕</span>
+                <input type="search" placeholder="Search anything..." aria-label="Search anything">
+                <kbd>⌘ K</kbd>
+            </div>
+            <div class="wgp-appbar-actions">
+                <button class="wgp-icon-button" type="button" aria-label="Notifications"><span>♧</span><i>3</i></button>
+                <div class="wgp-admin-chip">
+                    <span class="wgp-admin-avatar">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span>
+                    <span><strong>{{ auth()->user()->name }}</strong><small>Store Manager</small></span>
+                    <span class="wgp-chevron">⌄</span>
+                </div>
+            </div>
+        </header>
+
         @yield('content')
 
     </main>
 
 </div>
 
+<script src="{{ asset('js/wgp-premium.js') }}" defer></script>
 @stack('scripts')
 
 </body>

@@ -42,15 +42,15 @@
                         @foreach($products as $product)
                             <tr>
                                 <td>
-                                    <div class="product-name">
-                                        {{ $product->name }}
-                                    </div>
+                                    <div class="wgp-product-listing">
+                                        @if($product->image_path)<img src="{{ asset('storage/'.$product->image_path) }}" alt="{{ $product->name }}">@else<div class="wgp-product-listing-placeholder">▣</div>@endif
+                                        <div><div class="product-name">{{ $product->name }}</div>
 
                                     @if($product->description)
                                         <div class="product-description">
                                             {{ Str::limit($product->description, 60) }}
                                         </div>
-                                    @endif
+                                    @endif</div></div>
                                 </td>
 
                                 <td>

@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -41,10 +42,13 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        Product::create([
-            ...$request->validated(),
-            'is_active' => $request->boolean('is_active', true),
-        ]);
+        $data = $request->validated();
+        unset($data['image']);
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store('products', 'public');
+        }
+        $data['is_active'] = $request->boolean('is_active', true);
+        Product::create($data);
 
         return redirect()
             ->route('admin.products.index')
@@ -80,10 +84,14 @@ class ProductController extends Controller
         UpdateProductRequest $request,
         Product $product
     ): RedirectResponse {
-        $product->update([
-            ...$request->validated(),
-            'is_active' => $request->boolean('is_active'),
-        ]);
+        $data = $request->validated();
+        unset($data['image']);
+        if ($request->hasFile('image')) {
+            if ($product->image_path) { Storage::disk('public')->delete($product->image_path); }
+            $data['image_path'] = $request->file('image')->store('products', 'public');
+        }
+        $data['is_active'] = $request->boolean('is_active');
+        $product->update($data);
 
         return redirect()
             ->route('admin.products.index')
@@ -95,6 +103,9 @@ class ProductController extends Controller
      */
     public function destroy(Product $product): RedirectResponse
     {
+        if ($product->image_path) {
+            Storage::disk('public')->delete($product->image_path);
+        }
         $product->delete();
 
         return redirect()

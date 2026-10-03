@@ -311,6 +311,21 @@
         </div>
 
 
+        <aside class="wgp-inbox-sidebar" aria-label="Admin navigation">
+            <a class="wgp-inbox-brand" href="{{ route('admin') }}"><img src="{{ asset('img/logo.png') }}" alt="Wonder Godoro Point"><span>WONDER<br>GODORO POINT</span></a>
+            <nav>
+                <a href="{{ route('admin') }}">⌂ <span>Dashboard</span></a>
+                <a href="{{ route('admin.products.index') }}">▣ <span>Products</span></a>
+                <a href="{{ route('admin.orders.index') }}">🛒 <span>Orders</span></a>
+                <a href="{{ route('admin.customers.index') }}">♟ <span>Customers</span></a>
+                <a class="is-active" href="{{ route('admin.inbox') }}">◉ <span>WhatsApp Inbox</span><b>{{ $conversations->count() }}</b></a>
+                <a href="{{ route('admin.reports.index') }}">▥ <span>Sales & Reports</span></a>
+                <a href="{{ route('admin.delivery.index') }}">▸ <span>Delivery</span></a>
+                <a href="{{ route('admin.settings.index') }}">⚙ <span>Settings</span></a>
+            </nav>
+            <div class="wgp-inbox-store"><strong>Wonder Godoro Point</strong><small>Dar es Salaam</small></div>
+        </aside>
+
         <header class="inbox-header">
 
             <a

@@ -9,6 +9,6 @@
 <div class="product-page">
     <div class="product-head"><div><h1>Edit Product</h1><p>Update pricing, cost, stock and availability.</p></div><a class="product-btn" href="{{ route('admin.products.show', $product) }}">← Product</a></div>
     @if($errors->any())<div class="dashboard-alert dashboard-alert--error"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-    <div class="product-card"><form method="POST" action="{{ route('admin.products.update', $product) }}">@csrf @method('PUT') @include('admin.products._form')<div class="product-actions"><a class="product-btn" href="{{ route('admin.products.show', $product) }}">Cancel</a><button class="product-btn product-btn-primary" type="submit">Save Changes</button></div></form></div>
+    <div class="product-card"><form enctype="multipart/form-data" method="POST" action="{{ route('admin.products.update', $product) }}">@csrf @method('PUT') @include('admin.products._form')<div class="product-actions"><a class="product-btn" href="{{ route('admin.products.show', $product) }}">Cancel</a><button class="product-btn product-btn-primary" type="submit">Save Changes</button></div></form></div>
 </div>
 @endsection

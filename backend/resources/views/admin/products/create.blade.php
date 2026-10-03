@@ -10,7 +10,7 @@
     <div class="product-head"><div><h1>Add Product</h1><p>Create a product with pricing, cost and stock information.</p></div><a class="product-btn" href="{{ route('admin.products.index') }}">← Products</a></div>
     @if($errors->any())<div class="dashboard-alert dashboard-alert--error"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <div class="product-card">
-        <form method="POST" action="{{ route('admin.products.store') }}">
+        <form enctype="multipart/form-data" method="POST" action="{{ route('admin.products.store') }}">
             @csrf
             @include('admin.products._form')
             <div class="product-actions"><a class="product-btn" href="{{ route('admin.products.index') }}">Cancel</a><button class="product-btn product-btn-primary" type="submit">Create Product</button></div>
