@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        $this->call(ProductCategorySeeder::class);
+
         User::updateOrCreate(
             ['email' => $email],
             [

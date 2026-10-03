@@ -34,6 +34,18 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Keep the product form usable even when an older deployment has not run the category seeder.
+        if ($categories->isEmpty()) {
+            app(\Database\Seeders\ProductCategorySeeder::class)->run();
+            $categories = ProductCategory::where('is_active', true)->orderBy('name')->get();
+        }
+
+        // Keep the product form usable even when an older deployment has not run the category seeder.
+        if ($categories->isEmpty()) {
+            app(\Database\Seeders\ProductCategorySeeder::class)->run();
+            $categories = ProductCategory::where('is_active', true)->orderBy('name')->get();
+        }
+
         return view('admin.products.create', compact('categories'));
     }
 

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded',()=>{
  document.body.classList.add('wgp-page-enter');
  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const reveal=[...document.querySelectorAll('.dashboard-module-section,.wgp-panel,.wgp-table-wrap,.dashboard-welcome')];
+ const reveal=[...document.querySelectorAll('.dashboard-module-section,.wgp-panel,.wgp-table-wrap,.dashboard-welcome,.dashboard-card,.stat-card,.kpi-card,.product-card,.order-card,.inbox-panel,.inbox-conversation-item,.inbox-message')];
  reveal.forEach((el,i)=>{el.dataset.wgpReveal=''; el.style.transitionDelay=reduce?'0ms':`${Math.min(i*45,360)}ms`; requestAnimationFrame(()=>el.classList.add('wgp-visible'));});
  const menu=document.querySelector('.wgp-mobile-menu'); const sidebar=document.querySelector('.dashboard-sidebar');
  menu?.addEventListener('click',()=>{const open=sidebar?.classList.toggle('wgp-mobile-open'); menu.setAttribute('aria-expanded',open?'true':'false');});

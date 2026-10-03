@@ -8,9 +8,7 @@ use Illuminate\Database\Seeder;
 class ProductCategorySeeder extends Seeder
 {
     public function run(): void
-    {$this->call([
-    ProductCategorySeeder::class,
-]);
+    {
         $categories = [
             [
                 'name' => 'Orthopedic',
