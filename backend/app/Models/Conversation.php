@@ -42,4 +42,24 @@ class Conversation extends Model
     {
         return $this->hasOne(Message::class)->latestOfMany();
     }
+
+    public function aiState(): HasOne
+    {
+        return $this->hasOne(AiConversationState::class);
+    }
+
+    public function aiActions(): HasMany
+    {
+        return $this->hasMany(AiAction::class);
+    }
+
+    public function aiEscalations(): HasMany
+    {
+        return $this->hasMany(AiEscalation::class);
+    }
+
+    public function aiFollowUps(): HasMany
+    {
+        return $this->hasMany(AiFollowUp::class);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\ProcessAiConversation;
 use App\Models\Conversation;
 use App\Models\Customer;
 use App\Models\Message;
@@ -11,6 +12,7 @@ use App\Services\WhatsAppService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class WhatsAppIntegrationTest extends TestCase
@@ -144,6 +146,28 @@ class WhatsAppIntegrationTest extends TestCase
         $this->assertDatabaseCount('customers', 1);
         $this->assertDatabaseCount('conversations', 1);
         $this->assertDatabaseCount('messages', 1);
+    }
+
+    public function test_ai_disabled_webhook_still_persists_inbound_message_without_queueing_ai_reply(): void
+    {
+        config(['ai.enabled' => false]);
+        Queue::fake();
+        $payload = $this->incomingPayload('wamid.ai-disabled-001');
+
+        $this->postJson(
+            '/webhooks/whatsapp',
+            $payload,
+            ['X-Hub-Signature-256' => $this->metaSignature($payload)]
+        )
+            ->assertOk()
+            ->assertJson(['received' => true]);
+
+        $this->assertDatabaseHas('messages', [
+            'provider_message_id' => 'wamid.ai-disabled-001',
+            'direction' => 'inbound',
+        ]);
+        $this->assertSame(0, Message::query()->where('direction', 'outbound')->count());
+        Queue::assertNotPushed(ProcessAiConversation::class);
     }
 
     public function test_configured_outbound_text_uses_mocked_whatsapp_api_and_stores_provider_id(): void

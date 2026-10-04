@@ -58,6 +58,29 @@ const showWhatsAppNotification = async (data) => {
     }
 };
 
+const showAiEscalationNotification = async (data) => {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+        return;
+    }
+
+    const title = 'WGP AI needs a human review';
+    const body = `Conversation with ${data.customer_name || 'a customer'} needs attention.`;
+
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification(title, {
+            body,
+            icon: '/img/logo.png',
+            badge: '/img/logo.png',
+            tag: `ai-escalation-${data.conversation_id}`,
+            renotify: true,
+            data: { url: data.url || '/admin/ai' },
+        });
+    } catch {
+        new Notification(title, { body, icon: '/img/logo.png' });
+    }
+};
+
 const subscribeToWhatsAppNotifications = () => {
     if (!window.Echo) {
         return;
@@ -67,6 +90,9 @@ const subscribeToWhatsAppNotifications = () => {
         .channel('admin-notifications')
         .listen('.whatsapp.message.received', (data) => {
             showWhatsAppNotification(data);
+        })
+        .listen('.ai.conversation.escalated', (data) => {
+            showAiEscalationNotification(data);
         });
 };
 

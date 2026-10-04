@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AutomationController;
+use App\Http\Controllers\Admin\AiAgentController;
+use App\Http\Controllers\Admin\AiConversationController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\ReportsController;
@@ -45,6 +47,27 @@ Route::middleware(['auth', 'admin'])
         Route::get('/dashboard', function () {
             return view('admin.dashboard');
         })->name('dashboard');
+
+        // AI Sales & Customer Agent
+        Route::get('/ai', [AiAgentController::class, 'index'])->name('ai.index');
+        Route::put('/ai/settings', [AiAgentController::class, 'updateSettings'])->name('ai.settings.update');
+        Route::post('/ai/knowledge', [AiAgentController::class, 'storeKnowledge'])->name('ai.knowledge.store');
+        Route::put('/ai/knowledge/{knowledge}', [AiAgentController::class, 'updateKnowledge'])->name('ai.knowledge.update');
+        Route::delete('/ai/knowledge/{knowledge}', [AiAgentController::class, 'destroyKnowledge'])->name('ai.knowledge.destroy');
+        Route::get('/ai/conversations/{conversation}', [AiConversationController::class, 'show'])
+            ->name('ai.conversations.show');
+        Route::post('/ai/conversations/{conversation}/take-over', [AiConversationController::class, 'takeOver'])
+            ->name('ai.conversations.take-over');
+        Route::post('/ai/conversations/{conversation}/return-to-ai', [AiConversationController::class, 'returnToAi'])
+            ->name('ai.conversations.return-to-ai');
+        Route::post('/ai/conversations/{conversation}/pause', [AiConversationController::class, 'pause'])
+            ->name('ai.conversations.pause');
+        Route::post('/ai/conversations/{conversation}/resume', [AiConversationController::class, 'resume'])
+            ->name('ai.conversations.resume');
+        Route::post('/ai/conversations/{conversation}/escalate', [AiConversationController::class, 'escalate'])
+            ->name('ai.conversations.escalate');
+        Route::post('/ai/conversations/{conversation}/close', [AiConversationController::class, 'close'])
+            ->name('ai.conversations.close');
 
         // Inbox
         Route::get('/inbox', [InboxController::class, 'index'])

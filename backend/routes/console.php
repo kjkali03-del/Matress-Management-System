@@ -10,3 +10,7 @@ Artisan::command('inspire', function () {
 Schedule::command('automation:process-followups')
     ->everyMinute()
     ->withoutOverlapping();
+
+Schedule::command('ai:process-follow-ups')
+    ->everyMinute()
+    ->withoutOverlapping();

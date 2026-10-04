@@ -57,6 +57,16 @@
                 <span class="nav-state">Open</span>
             </a>
 
+            {{-- AI Sales Agent --}}
+            <a
+                class="dashboard-nav-item {{ request()->routeIs('admin.ai*') ? 'is-active' : '' }}"
+                href="{{ route('admin.ai.index') }}"
+            >
+                <span class="nav-icon" aria-hidden="true">&#9733;</span>
+                <span>AI Agent</span>
+                <span class="nav-state">Open</span>
+            </a>
+
             <p class="dashboard-nav-label dashboard-nav-label--later">
                 Business
             </p>

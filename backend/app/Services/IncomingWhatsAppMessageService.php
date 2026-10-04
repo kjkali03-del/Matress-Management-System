@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\NewWhatsAppMessage;
+use App\Jobs\ProcessAiConversation;
 use App\Models\Call;
 use App\Models\Conversation;
 use App\Models\Customer;
@@ -63,6 +64,10 @@ class IncomingWhatsAppMessageService
                         $this->automationService->handleIncomingMessage(
                             $message
                         );
+
+                        if (filter_var(config('ai.enabled'), FILTER_VALIDATE_BOOL)) {
+                            ProcessAiConversation::dispatch($message->id)->afterCommit();
+                        }
 
                         /*
                          * Broadcast the new WhatsApp message to the
