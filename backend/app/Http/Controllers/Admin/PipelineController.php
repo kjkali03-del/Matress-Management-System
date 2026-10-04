@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PipelineController extends Controller
@@ -28,17 +27,16 @@ class PipelineController extends Controller
             ->with([
                 'tags',
                 'assignedUser',
+                'latestConversation',
             ])
             ->withCount('conversations')
             ->when($search !== '', function ($query) use ($search): void {
-                $query->where(function ($query) use ($search): void {
-                    $term = '%' . mb_strtolower($search, 'UTF-8') . '%';
-                    $query->where(function ($query) use ($term): void {
-                        $query
-                            ->whereRaw('LOWER(name) LIKE ?', [$term])
-                            ->orWhereRaw('LOWER(phone) LIKE ?', [$term])
-                            ->orWhereRaw('LOWER(location) LIKE ?', [$term]);
-                    });
+                $term = '%' . mb_strtolower($search, 'UTF-8') . '%';
+                $query->where(function ($query) use ($term): void {
+                    $query
+                        ->whereRaw('LOWER(name) LIKE ?', [$term])
+                        ->orWhereRaw('LOWER(phone) LIKE ?', [$term])
+                        ->orWhereRaw('LOWER(location) LIKE ?', [$term]);
                 });
             })
             ->latest('last_contact_at')

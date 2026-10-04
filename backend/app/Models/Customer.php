@@ -33,12 +33,20 @@ class Customer extends Model
 
     protected function casts(): array
     {
-        return ['next_follow_up_at' => 'datetime'];
+        return [
+            'next_follow_up_at' => 'datetime',
+            'last_contact_at' => 'datetime',
+        ];
     }
 
     public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    public function latestConversation(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Conversation::class)->latestOfMany('last_message_at');
     }
 
     public function orders(): HasMany

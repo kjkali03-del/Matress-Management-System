@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-ui.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/wgp-premium.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/wgp-premium.css') . '?v=20261004-v4' }}">
 
     @vite('resources/js/app.js')
 
@@ -209,7 +209,7 @@
 
 </div>
 
-<script src="{{ asset('js/wgp-premium.js') }}" defer></script>
+<script src="{{ asset('js/wgp-premium.js') . '?v=20261004-v4' }}" defer></script>
 @stack('scripts')
 
 </body>

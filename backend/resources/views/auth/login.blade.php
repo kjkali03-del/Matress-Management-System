@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Admin Login | Wonder Godoro Point</title>
-        <link rel="stylesheet" href="{{ asset('css/splash.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/splash.css') . '?v=20261004-v4' }}">
+        <link rel="stylesheet" href="{{ asset('css/auth.css') . '?v=20261004-v4' }}">
     </head>
     <body class="auth-page">
         @include('components.splash')
@@ -61,6 +61,6 @@
             </section>
         </main>
 
-        <script src="{{ asset('js/splash.js') }}" defer></script>
+        <script src="{{ asset('js/splash.js') . '?v=20261004-v4' }}" defer></script>
     </body>
 </html>
