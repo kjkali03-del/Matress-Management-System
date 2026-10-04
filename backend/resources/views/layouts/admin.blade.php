@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>@yield('title', 'Admin | Wonder Godoro Point')</title>
+    @php $wgpBrandName = \App\Models\Setting::value('brand_name', 'Wonder Godoro Point'); $wgpBrandLogo = \App\Models\Setting::value('brand_logo', 'img/logo.png'); @endphp
+    <title>@yield('title', 'Admin | ' . $wgpBrandName)</title>
 
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
@@ -25,10 +26,10 @@
 
         <a class="dashboard-logo" href="{{ route('admin') }}">
             <img
-                src="{{ asset('img/logo.png') }}"
+                src="{{ asset($wgpBrandLogo) }}"
                 alt="Wonder Godoro Point Mattress Shop"
             >
-            <span>Admin workspace</span>
+            <span>{{ $wgpBrandName }}</span>
         </a>
 
         <nav class="dashboard-nav" aria-label="Admin navigation">

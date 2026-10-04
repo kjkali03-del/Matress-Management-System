@@ -1,220 +1,29 @@
 @extends('layouts.admin')
-
 @section('title', 'Order ' . $order->order_number . ' | Wonder Godoro Point')
-
+@push('styles')
+<style>
+.wgp-order-page{max-width:1180px;margin:0 auto;padding:0 0 42px}.wgp-order-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin:20px 0}.wgp-order-head h1{margin:4px 0 6px;font-size:32px;color:#182235}.wgp-order-head p{margin:0;color:#738095}.wgp-eyebrow{color:#b28a20;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.wgp-order-actions{display:flex;gap:8px}.wgp-btn{display:inline-flex;align-items:center;justify-content:center;border-radius:10px;padding:10px 15px;text-decoration:none;font-size:12px;font-weight:800}.wgp-btn-primary{background:linear-gradient(135deg,#d6a62d,#f1c85b);color:#101827}.wgp-btn-secondary{background:#fff;border:1px solid #dfe5ec;color:#516075}.wgp-order-statusbar{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border:1px solid #e7ebf1;border-radius:14px;padding:14px 16px;box-shadow:0 8px 24px rgba(20,34,55,.05);margin-bottom:16px}.wgp-badge{display:inline-flex;padding:6px 10px;border-radius:999px;background:#edf9f2;color:#176b43;font-size:11px;font-weight:800}.wgp-order-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr);gap:16px}.wgp-card{background:#fff;border:1px solid #e7ebf1;border-radius:16px;box-shadow:0 10px 35px rgba(20,34,55,.07);padding:20px}.wgp-card+.wgp-card{margin-top:16px}.wgp-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid #edf0f4;padding-bottom:13px;margin-bottom:14px}.wgp-card h2{margin:0;font-size:16px;color:#182235}.wgp-card-head p{margin:4px 0 0;font-size:12px;color:#738095}.wgp-item{display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid #edf0f4}.wgp-item:last-child{border-bottom:0}.wgp-item strong{display:block;font-size:13px}.wgp-item small{color:#738095;font-size:11px}.wgp-money{font-weight:800;color:#182235}.wgp-summary{display:grid;gap:9px;margin-top:15px}.wgp-summary-row{display:flex;justify-content:space-between;font-size:12px;color:#66748a}.wgp-summary-row.total{padding-top:12px;border-top:1px solid #e7ebf1;font-size:15px;color:#182235;font-weight:900}.wgp-customer{display:flex;gap:12px;align-items:center}.wgp-avatar{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#0b1728;color:#fff;font-weight:800}.wgp-customer strong{display:block}.wgp-customer small{color:#738095}.wgp-info-list{display:grid;gap:11px;margin-top:16px}.wgp-info-row{display:flex;justify-content:space-between;gap:14px;font-size:12px}.wgp-info-row span{color:#738095}.wgp-info-row strong{text-align:right;color:#182235}.wgp-timeline{display:grid;gap:0}.wgp-timeline-item{position:relative;display:grid;grid-template-columns:24px 1fr;gap:10px;padding-bottom:17px}.wgp-timeline-item:not(:last-child)::before{content:"";position:absolute;left:11px;top:24px;bottom:0;width:1px;background:#dfe5ec}.wgp-dot{position:relative;z-index:1;width:23px;height:23px;border-radius:50%;background:#fff;border:2px solid #d6a62d;display:grid;place-items:center;color:#d6a62d;font-size:10px}.wgp-timeline-item strong{font-size:12px}.wgp-timeline-item small{display:block;color:#738095;margin-top:3px}.wgp-activity{display:grid;gap:13px}.wgp-activity-item{display:flex;gap:11px;padding-bottom:13px;border-bottom:1px solid #edf0f4}.wgp-activity-item:last-child{border-bottom:0;padding-bottom:0}.wgp-activity-icon{width:28px;height:28px;border-radius:8px;background:#fff8df;color:#a47700;display:grid;place-items:center;font-size:12px;font-weight:900}.wgp-activity-item strong{display:block;font-size:12px}.wgp-activity-item small{display:block;color:#738095;font-size:10px;margin-top:3px}.wgp-flash{margin-bottom:15px;padding:12px 14px;border-radius:11px;background:#edf9f2;color:#176b43;font-size:12px;font-weight:700}@media(max-width:900px){.wgp-order-grid{grid-template-columns:1fr}.wgp-order-head{align-items:flex-start;flex-direction:column}.wgp-order-statusbar{align-items:flex-start;flex-direction:column}.wgp-item{grid-template-columns:1fr auto}}
+</style>
+@endpush
 @section('content')
-<div class="dashboard-content">
-
-    <div class="dashboard-page-header">
-        <div>
-            <p class="dashboard-eyebrow">Order Details</p>
-            <h1>{{ $order->order_number }}</h1>
-            <p class="dashboard-subtitle">
-                View and manage this customer order.
-            </p>
-        </div>
-
-        <div class="dashboard-page-actions">
-            <a
-                href="{{ route('admin.orders.edit', $order) }}"
-                class="dashboard-primary-button"
-            >
-                Edit Order
-            </a>
-
-            <a
-                href="{{ route('admin.orders.index') }}"
-                class="dashboard-secondary-button"
-            >
-                ← Orders
-            </a>
-        </div>
+<div class="wgp-order-page">
+  @if(session('status'))<div class="wgp-flash">✓ {{ session('status') }}</div>@endif
+  <div class="wgp-order-head"><div><div class="wgp-eyebrow">Order Details</div><h1>{{ $order->order_number }}</h1><p>View and manage this customer order.</p></div><div class="wgp-order-actions"><a class="wgp-btn wgp-btn-secondary" href="{{ route('admin.orders.index') }}">← Orders</a><a class="wgp-btn wgp-btn-primary" href="{{ route('admin.orders.edit',$order) }}">Edit Order</a></div></div>
+  <div class="wgp-order-statusbar"><div><strong>Order status</strong><div style="color:#738095;font-size:11px;margin-top:3px">{{ $order->ordered_at?->format('d M Y, H:i') ?? 'Date not set' }}</div></div><span class="wgp-badge">{{ ucfirst($order->status) }}</span></div>
+  <div class="wgp-order-grid">
+    <div>
+      <section class="wgp-card"><div class="wgp-card-head"><div><h2>Order Items</h2><p>Products included in this order.</p></div></div><div class="wgp-item"><div><strong>{{ $order->product_name }}</strong><small>{{ $order->product_size ?: 'Size not specified' }}</small></div><span>× {{ $order->quantity }}</span><span class="wgp-money">TSh {{ number_format((float)$order->unit_price) }}</span><span class="wgp-money">TSh {{ number_format((float)$order->total_amount) }}</span></div><div class="wgp-summary"><div class="wgp-summary-row"><span>Subtotal</span><strong>TSh {{ number_format((float)$order->total_amount) }}</strong></div><div class="wgp-summary-row"><span>Delivery</span><strong>Free</strong></div><div class="wgp-summary-row total"><span>Total</span><strong>TSh {{ number_format((float)$order->total_amount) }}</strong></div></div></section>
+      <section class="wgp-card"><div class="wgp-card-head"><div><h2>Order Timeline</h2><p>Current progress of this order.</p></div></div><div class="wgp-timeline">
+        @foreach([['pending','Order placed'],['confirmed','Order confirmed'],['completed','Order completed'],['cancelled','Order cancelled']] as $step) @php $active=$order->status===$step[0]; @endphp @if($active || $step[0] !== 'cancelled')<div class="wgp-timeline-item"><div class="wgp-dot">{{ $active?'✓':'•' }}</div><div><strong>{{ $step[1] }}</strong><small>{{ $active ? 'Current status' : 'Next stage' }}</small></div></div>@endif @endforeach
+      </div></section>
+      <section class="wgp-card"><div class="wgp-card-head"><div><h2>Activity</h2><p>Recent changes to this order.</p></div></div><div class="wgp-activity">@forelse($order->activities as $activity)<div class="wgp-activity-item"><div class="wgp-activity-icon">✓</div><div><strong>{{ $activity->description }}</strong><small>{{ $activity->created_at->format('d M Y, H:i') }} · {{ $activity->user?->name ?? 'System' }}</small></div></div>@empty<div style="color:#738095;font-size:12px">No activity recorded yet.</div>@endforelse</div></section>
     </div>
-
-    @if(session('status'))
-        <div class="dashboard-alert dashboard-alert--success">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <div class="dashboard-grid dashboard-grid--two">
-
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-header">
-                <div>
-                    <h2>Order Information</h2>
-                    <p>Basic details of this order.</p>
-                </div>
-            </div>
-
-            <div class="dashboard-detail-list">
-
-                <div class="dashboard-detail-row">
-                    <span>Order Number</span>
-                    <strong>{{ $order->order_number }}</strong>
-                </div>
-
-                <div class="dashboard-detail-row">
-                    <span>Customer</span>
-                    <strong>
-                        {{ $order->customer->name ?? 'Unknown Customer' }}
-                    </strong>
-                </div>
-
-                <div class="dashboard-detail-row">
-                    <span>Phone</span>
-                    <strong>
-                        {{ $order->customer->phone ?? 'N/A' }}
-                    </strong>
-                </div>
-
-                <div class="dashboard-detail-row">
-                    <span>Product</span>
-                    <strong>{{ $order->product_name }}</strong>
-                </div>
-
-                <div class="dashboard-detail-row">
-                    <span>Size</span>
-                    <strong>{{ $order->product_size ?: 'N/A' }}</strong>
-                </div>
-
-                <div class="dashboard-detail-row">
-                    <span>Quantity</span>
-                    <strong>{{ $order->quantity }}</strong>
-                </div>
-
-                <div class="dashboard-detail-row">
-                    <span>Unit Price</span>
-                    <strong>
-                        TSh {{ number_format((float) $order->unit_price, 0) }}
-                    </strong>
-                </div>
-
-                <div class="dashboard-detail-row dashboard-detail-row--total">
-                    <span>Total Amount</span>
-                    <strong>
-                        TSh {{ number_format((float) $order->total_amount, 0) }}
-                    </strong>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-header">
-                <div>
-                    <h2>Order Status</h2>
-                    <p>Current progress of this order.</p>
-                </div>
-            </div>
-
-            <div class="dashboard-status-stack">
-
-                <div class="dashboard-status-item">
-                    <span>Order Status</span>
-
-                    <span class="dashboard-status-badge dashboard-status-badge--{{ $order->status }}">
-                        {{ ucfirst($order->status) }}
-                    </span>
-                </div>
-
-                <div class="dashboard-status-item">
-                    <span>Payment</span>
-
-                    <span class="dashboard-status-badge dashboard-status-badge--{{ $order->payment_status }}">
-                        {{ ucfirst($order->payment_status) }}
-                    </span>
-                </div>
-
-                <div class="dashboard-status-item">
-                    <span>Delivery</span>
-
-                    <span class="dashboard-status-badge dashboard-status-badge--{{ $order->delivery_status }}">
-                        {{ ucfirst($order->delivery_status) }}
-                    </span>
-                </div>
-
-                <div class="dashboard-status-item">
-                    <span>Ordered At</span>
-
-                    <strong>
-                        {{ $order->ordered_at?->format('d M Y H:i') ?? $order->created_at->format('d M Y H:i') }}
-                    </strong>
-                </div>
-
-            </div>
-
-        </div>
-
+    <div>
+      <section class="wgp-card"><div class="wgp-card-head"><div><h2>Customer</h2><p>Customer information.</p></div></div><div class="wgp-customer"><div class="wgp-avatar">{{ str($order->customer?->name ?? 'C')->substr(0,1)->upper() }}</div><div><strong>{{ $order->customer?->name ?? 'Unknown customer' }}</strong><small>{{ $order->customer?->phone ?? 'No phone number' }}</small></div></div><div class="wgp-info-list"><div class="wgp-info-row"><span>Phone</span><strong>{{ $order->customer?->phone ?? '—' }}</strong></div><div class="wgp-info-row"><span>Location</span><strong>{{ $order->delivery_area ?? $order->customer?->location ?? '—' }}</strong></div></div></section>
+      <section class="wgp-card"><div class="wgp-card-head"><div><h2>Payment</h2><p>Payment status for this order.</p></div></div><div class="wgp-info-list"><div class="wgp-info-row"><span>Status</span><strong>{{ ucfirst($order->payment_status) }}</strong></div><div class="wgp-info-row"><span>Amount</span><strong>TSh {{ number_format((float)$order->total_amount) }}</strong></div></div></section>
+      <section class="wgp-card"><div class="wgp-card-head"><div><h2>Delivery</h2><p>Delivery information.</p></div></div><div class="wgp-info-list"><div class="wgp-info-row"><span>Status</span><strong>{{ ucfirst($order->delivery_status) }}</strong></div><div class="wgp-info-row"><span>Area</span><strong>{{ $order->delivery_area ?: '—' }}</strong></div><div class="wgp-info-row"><span>Assigned to</span><strong>{{ $order->deliveryAssignee?->name ?: 'Not assigned' }}</strong></div><div class="wgp-info-row"><span>Address</span><strong>{{ $order->delivery_address ?: '—' }}</strong></div><div class="wgp-info-row"><span>Notes</span><strong>{{ $order->delivery_notes ?: '—' }}</strong></div></div></section>
+      @if($order->notes)<section class="wgp-card"><div class="wgp-card-head"><div><h2>Order Notes</h2></div></div><div style="font-size:12px;line-height:1.7;color:#59677c">{{ $order->notes }}</div></section>@endif
     </div>
-
-    <div class="dashboard-card">
-
-        <div class="dashboard-card-header">
-            <div>
-                <h2>Delivery Information</h2>
-                <p>Customer delivery details.</p>
-            </div>
-        </div>
-
-        <div class="dashboard-detail-block">
-            <span>Delivery Address</span>
-
-            <p>
-                {{ $order->delivery_address ?: 'No delivery address added.' }}
-            </p>
-        </div>
-
-    </div>
-
-    <div class="dashboard-card">
-
-        <div class="dashboard-card-header">
-            <div>
-                <h2>Order Notes</h2>
-                <p>Additional information about this order.</p>
-            </div>
-        </div>
-
-        <div class="dashboard-detail-block">
-            <p>
-                {{ $order->notes ?: 'No notes have been added.' }}
-            </p>
-        </div>
-
-    </div>
-
-    <div class="dashboard-card dashboard-danger-card">
-
-        <div class="dashboard-card-header">
-            <div>
-                <h2>Delete Order</h2>
-                <p>
-                    Deleting an order cannot be undone.
-                </p>
-            </div>
-        </div>
-
-        <form
-            method="POST"
-            action="{{ route('admin.orders.destroy', $order) }}"
-            onsubmit="return confirm('Are you sure you want to delete this order?');"
-        >
-            @csrf
-            @method('DELETE')
-
-            <button
-                type="submit"
-                class="dashboard-danger-button"
-            >
-                Delete Order
-            </button>
-        </form>
-
-    </div>
-
+  </div>
 </div>
 @endsection

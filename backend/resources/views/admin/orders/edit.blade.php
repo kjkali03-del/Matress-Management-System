@@ -1,289 +1,41 @@
 @extends('layouts.admin')
-
 @section('title', 'Edit ' . $order->order_number . ' | Wonder Godoro Point')
-
+@push('styles')
+<style>
+.wgp-edit-page{max-width:1180px;margin:0 auto;padding:0 0 42px}.wgp-edit-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:20px 0}.wgp-edit-head h1{margin:4px 0 6px;font-size:30px;color:#182235}.wgp-edit-head p{margin:0;color:#738095}.wgp-eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#b28a20}.wgp-edit-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.75fr);gap:16px}.wgp-card{background:#fff;border:1px solid #e7ebf1;border-radius:16px;box-shadow:0 10px 35px rgba(20,34,55,.07);padding:20px}.wgp-card+.wgp-card{margin-top:16px}.wgp-card h2{margin:0;font-size:16px;color:#182235}.wgp-card>p{margin:5px 0 18px;color:#738095;font-size:12px}.wgp-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.wgp-field{display:grid;gap:7px}.wgp-field.full{grid-column:1/-1}.wgp-field label{font-size:11px;font-weight:800;color:#344157}.wgp-field input,.wgp-field select,.wgp-field textarea{width:100%;box-sizing:border-box;border:1px solid #dfe5ec;border-radius:10px;padding:11px 12px;background:#fff;color:#182235;font:inherit;font-size:12px}.wgp-field textarea{resize:vertical;min-height:95px}.wgp-field input:focus,.wgp-field select:focus,.wgp-field textarea:focus{outline:0;border-color:#d6a62d;box-shadow:0 0 0 3px rgba(214,166,45,.12)}.wgp-help{font-size:10px;color:#8a96a8}.wgp-summary{background:#f8f9fb;border:1px solid #edf0f4;border-radius:13px;padding:15px}.wgp-summary-row{display:flex;justify-content:space-between;padding:8px 0;font-size:12px;color:#68768a}.wgp-summary-row.total{border-top:1px solid #dfe5ec;margin-top:5px;padding-top:13px;font-size:15px;font-weight:900;color:#182235}.wgp-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.wgp-btn{border-radius:10px;padding:11px 16px;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer}.wgp-secondary{background:#fff;border:1px solid #dfe5ec;color:#516075}.wgp-primary{border:0;background:linear-gradient(135deg,#d6a62d,#f1c85b);color:#101827}.wgp-alert{padding:12px 14px;border-radius:11px;background:#fff0f0;color:#a32626;font-size:12px;margin-bottom:15px}.wgp-status-card{display:grid;gap:13px}.wgp-status-card .wgp-field{margin:0}.wgp-order-id{padding:12px;background:#f8f9fb;border-radius:10px;color:#516075;font-size:11px}.wgp-order-id strong{display:block;color:#182235;font-size:13px;margin-top:3px}@media(max-width:900px){.wgp-edit-grid{grid-template-columns:1fr}.wgp-form-grid{grid-template-columns:1fr}.wgp-field.full{grid-column:auto}.wgp-edit-head{align-items:flex-start;flex-direction:column}}
+</style>
+@endpush
 @section('content')
-<div class="dashboard-content">
-
-    <div class="dashboard-page-header">
-        <div>
-            <p class="dashboard-eyebrow">Orders</p>
-            <h1>Edit Order</h1>
-            <p class="dashboard-subtitle">
-                Update {{ $order->order_number }}.
-            </p>
-        </div>
-
-        <div class="dashboard-page-actions">
-            <a
-                href="{{ route('admin.orders.show', $order) }}"
-                class="dashboard-secondary-button"
-            >
-                ← Back to Order
-            </a>
-        </div>
+<div class="wgp-edit-page">
+  @if($errors->any())<div class="wgp-alert"><strong>Please fix the highlighted details.</strong><ul style="margin:6px 0 0 18px">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+  <div class="wgp-edit-head"><div><div class="wgp-eyebrow">Orders / Edit</div><h1>Edit Order</h1><p>Update customer, product, payment and delivery information.</p></div><a class="wgp-btn wgp-secondary" href="{{ route('admin.orders.show',$order) }}">← Back to Order</a></div>
+  <form method="POST" action="{{ route('admin.orders.update',$order) }}" id="wgp-edit-order">@csrf @method('PUT')
+    <div class="wgp-edit-grid">
+      <div>
+        <section class="wgp-card"><h2>Customer & Product</h2><p>Keep the order connected to the saved customer and product catalogue.</p><div class="wgp-form-grid">
+          <div class="wgp-field full"><label>Customer *</label><select name="customer_id" required><option value="">Select customer</option>@foreach($customers as $customer)<option value="{{ $customer->id }}" @selected(old('customer_id',$order->customer_id)==$customer->id)>{{ $customer->name }}{{ $customer->phone?' — '.$customer->phone:'' }}</option>@endforeach</select></div>
+          <div class="wgp-field full"><label>Saved Product</label><select name="product_id" id="wgp-product"><option value="">Keep / manual product</option>@foreach($products as $product)<option value="{{ $product->id }}" data-name="{{ $product->name }}" data-size="{{ $product->size }}" data-price="{{ $product->price }}" @selected(old('product_id',$order->product_id)==$product->id)>{{ $product->name }}{{ $product->size?' · '.$product->size:'' }} — TSh {{ number_format((float)$product->price) }}</option>@endforeach</select><span class="wgp-help">Choosing a saved product fills the product details and catalogue price.</span></div>
+          <div class="wgp-field"><label>Product Name *</label><input id="product_name" name="product_name" value="{{ old('product_name',$order->product_name) }}" required></div>
+          <div class="wgp-field"><label>Size</label><input id="product_size" name="product_size" value="{{ old('product_size',$order->product_size) }}"></div>
+          <div class="wgp-field"><label>Quantity *</label><input id="quantity" type="number" name="quantity" min="1" value="{{ old('quantity',$order->quantity) }}" required></div>
+          <div class="wgp-field"><label>Unit Price (TSh) *</label><input id="unit_price" type="number" name="unit_price" min="0" step="0.01" value="{{ old('unit_price',$order->unit_price) }}" required></div>
+          <div class="wgp-field full"><label>Order Date & Time</label><input type="datetime-local" name="ordered_at" value="{{ old('ordered_at',$order->ordered_at?->format('Y-m-d\TH:i')) }}"></div>
+        </div></section>
+        <section class="wgp-card"><h2>Delivery</h2><p>Everything needed to complete the delivery.</p><div class="wgp-form-grid">
+          <div class="wgp-field"><label>Delivery Status *</label><select name="delivery_status"><option value="pending" @selected(old('delivery_status',$order->delivery_status)==='pending')>Pending</option><option value="processing" @selected(old('delivery_status',$order->delivery_status)==='processing')>Processing</option><option value="delivered" @selected(old('delivery_status',$order->delivery_status)==='delivered')>Delivered</option><option value="cancelled" @selected(old('delivery_status',$order->delivery_status)==='cancelled')>Cancelled</option></select></div>
+          <div class="wgp-field"><label>Assigned Driver / Staff</label><select name="delivery_assigned_to"><option value="">Not assigned</option>@foreach($drivers as $driver)<option value="{{ $driver->id }}" @selected(old('delivery_assigned_to',$order->delivery_assigned_to)==$driver->id)>{{ $driver->name }}</option>@endforeach</select></div>
+          <div class="wgp-field"><label>Area / District</label><input name="delivery_area" value="{{ old('delivery_area',$order->delivery_area) }}" placeholder="e.g. Kinondoni"></div>
+          <div class="wgp-field full"><label>Delivery Address</label><textarea name="delivery_address" placeholder="Customer delivery location...">{{ old('delivery_address',$order->delivery_address) }}</textarea></div>
+          <div class="wgp-field full"><label>Delivery Notes</label><textarea name="delivery_notes" placeholder="Driver instructions or customer notes...">{{ old('delivery_notes',$order->delivery_notes) }}</textarea></div>
+        </div></section>
+        <section class="wgp-card"><h2>Order Notes</h2><p>Internal notes for your team.</p><div class="wgp-field"><textarea name="notes" rows="5">{{ old('notes',$order->notes) }}</textarea></div></section>
+      </div>
+      <div>
+        <section class="wgp-card wgp-status-card"><h2>Order Status</h2><div class="wgp-order-id">Order number<strong>{{ $order->order_number }}</strong></div><div class="wgp-field"><label>Status *</label><select name="status"><option value="pending" @selected(old('status',$order->status)==='pending')>Pending</option><option value="confirmed" @selected(old('status',$order->status)==='confirmed')>Confirmed</option><option value="completed" @selected(old('status',$order->status)==='completed')>Completed</option><option value="cancelled" @selected(old('status',$order->status)==='cancelled')>Cancelled</option></select></div><div class="wgp-field"><label>Payment Status *</label><select name="payment_status"><option value="unpaid" @selected(old('payment_status',$order->payment_status)==='unpaid')>Unpaid</option><option value="partial" @selected(old('payment_status',$order->payment_status)==='partial')>Partial</option><option value="paid" @selected(old('payment_status',$order->payment_status)==='paid')>Paid</option></select></div></section>
+        <section class="wgp-card"><h2>Order Summary</h2><p>Live total based on quantity and unit price.</p><div class="wgp-summary"><div class="wgp-summary-row"><span>Quantity</span><strong id="sum-qty">{{ $order->quantity }}</strong></div><div class="wgp-summary-row"><span>Unit price</span><strong id="sum-price">TSh {{ number_format((float)$order->unit_price) }}</strong></div><div class="wgp-summary-row total"><span>Total</span><strong id="sum-total">TSh {{ number_format((float)$order->total_amount) }}</strong></div></div><div class="wgp-actions"><a class="wgp-btn wgp-secondary" href="{{ route('admin.orders.show',$order) }}">Cancel</a><button class="wgp-btn wgp-primary" type="submit">Save Changes</button></div></section>
+      </div>
     </div>
-
-    @if($errors->any())
-        <div class="dashboard-alert dashboard-alert--error">
-            <strong>Please fix the following:</strong>
-
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <div class="dashboard-card">
-
-        <div class="dashboard-card-header">
-            <div>
-                <h2>Order Information</h2>
-                <p>
-                    Update the customer, product, payment and delivery details.
-                </p>
-            </div>
-        </div>
-
-        <form
-            method="POST"
-            action="{{ route('admin.orders.update', $order) }}"
-            class="dashboard-form"
-        >
-            @csrf
-            @method('PUT')
-
-            <div class="dashboard-form-grid">
-
-                <div class="dashboard-form-group dashboard-form-group--full">
-                    <label for="customer_id">
-                        Customer <span>*</span>
-                    </label>
-
-                    <select
-                        id="customer_id"
-                        name="customer_id"
-                        required
-                    >
-                        <option value="">Select customer</option>
-
-                        @foreach($customers as $customer)
-                            <option
-                                value="{{ $customer->id }}"
-                                {{ old('customer_id', $order->customer_id) == $customer->id ? 'selected' : '' }}
-                            >
-                                {{ $customer->name }}
-                                @if($customer->phone)
-                                    — {{ $customer->phone }}
-                                @endif
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="product_name">
-                        Product <span>*</span>
-                    </label>
-
-                    <input
-                        type="text"
-                        id="product_name"
-                        name="product_name"
-                        value="{{ old('product_name', $order->product_name) }}"
-                        required
-                    >
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="product_size">
-                        Size
-                    </label>
-
-                    <input
-                        type="text"
-                        id="product_size"
-                        name="product_size"
-                        value="{{ old('product_size', $order->product_size) }}"
-                        placeholder="e.g. 5x6 Inch 10"
-                    >
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="quantity">
-                        Quantity <span>*</span>
-                    </label>
-
-                    <input
-                        type="number"
-                        id="quantity"
-                        name="quantity"
-                        value="{{ old('quantity', $order->quantity) }}"
-                        min="1"
-                        required
-                    >
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="unit_price">
-                        Unit Price (TSh) <span>*</span>
-                    </label>
-
-                    <input
-                        type="number"
-                        id="unit_price"
-                        name="unit_price"
-                        value="{{ old('unit_price', $order->unit_price) }}"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="status">
-                        Order Status <span>*</span>
-                    </label>
-
-                    <select
-                        id="status"
-                        name="status"
-                        required
-                    >
-                        <option value="pending" {{ old('status', $order->status) === 'pending' ? 'selected' : '' }}>
-                            Pending
-                        </option>
-
-                        <option value="confirmed" {{ old('status', $order->status) === 'confirmed' ? 'selected' : '' }}>
-                            Confirmed
-                        </option>
-
-                        <option value="completed" {{ old('status', $order->status) === 'completed' ? 'selected' : '' }}>
-                            Completed
-                        </option>
-
-                        <option value="cancelled" {{ old('status', $order->status) === 'cancelled' ? 'selected' : '' }}>
-                            Cancelled
-                        </option>
-                    </select>
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="payment_status">
-                        Payment Status <span>*</span>
-                    </label>
-
-                    <select
-                        id="payment_status"
-                        name="payment_status"
-                        required
-                    >
-                        <option value="unpaid" {{ old('payment_status', $order->payment_status) === 'unpaid' ? 'selected' : '' }}>
-                            Unpaid
-                        </option>
-
-                        <option value="partial" {{ old('payment_status', $order->payment_status) === 'partial' ? 'selected' : '' }}>
-                            Partial
-                        </option>
-
-                        <option value="paid" {{ old('payment_status', $order->payment_status) === 'paid' ? 'selected' : '' }}>
-                            Paid
-                        </option>
-                    </select>
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="delivery_status">
-                        Delivery Status <span>*</span>
-                    </label>
-
-                    <select
-                        id="delivery_status"
-                        name="delivery_status"
-                        required
-                    >
-                        <option value="pending" {{ old('delivery_status', $order->delivery_status) === 'pending' ? 'selected' : '' }}>
-                            Pending
-                        </option>
-
-                        <option value="processing" {{ old('delivery_status', $order->delivery_status) === 'processing' ? 'selected' : '' }}>
-                            Processing
-                        </option>
-
-                        <option value="delivered" {{ old('delivery_status', $order->delivery_status) === 'delivered' ? 'selected' : '' }}>
-                            Delivered
-                        </option>
-
-                        <option value="cancelled" {{ old('delivery_status', $order->delivery_status) === 'cancelled' ? 'selected' : '' }}>
-                            Cancelled
-                        </option>
-                    </select>
-                </div>
-
-                <div class="dashboard-form-group dashboard-form-group--full">
-                    <label for="delivery_address">
-                        Delivery Address
-                    </label>
-
-                    <textarea
-                        id="delivery_address"
-                        name="delivery_address"
-                        rows="4"
-                        placeholder="Enter customer's delivery location..."
-                    >{{ old('delivery_address', $order->delivery_address) }}</textarea>
-                </div>
-
-                <div class="dashboard-form-group dashboard-form-group--full">
-                    <label for="notes">
-                        Order Notes
-                    </label>
-
-                    <textarea
-                        id="notes"
-                        name="notes"
-                        rows="4"
-                        placeholder="Add any important notes about this order..."
-                    >{{ old('notes', $order->notes) }}</textarea>
-                </div>
-
-                <div class="dashboard-form-group">
-                    <label for="ordered_at">
-                        Order Date & Time
-                    </label>
-
-                    <input
-                        type="datetime-local"
-                        id="ordered_at"
-                        name="ordered_at"
-                        value="{{ old('ordered_at', $order->ordered_at?->format('Y-m-d\TH:i')) }}"
-                    >
-                </div>
-
-            </div>
-
-            <div class="dashboard-form-actions">
-
-                <a
-                    href="{{ route('admin.orders.show', $order) }}"
-                    class="dashboard-secondary-button"
-                >
-                    Cancel
-                </a>
-
-                <button
-                    type="submit"
-                    class="dashboard-primary-button"
-                >
-                    Save Changes
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
+  </form>
 </div>
+@push('scripts')<script>(function(){const p=document.getElementById('wgp-product'),n=document.getElementById('product_name'),s=document.getElementById('product_size'),u=document.getElementById('unit_price'),q=document.getElementById('quantity'),sq=document.getElementById('sum-qty'),sp=document.getElementById('sum-price'),st=document.getElementById('sum-total');function fmt(v){return 'TSh '+Number(v||0).toLocaleString('en-US',{maximumFractionDigits:0});}function total(){sq.textContent=q.value||0;sp.textContent=fmt(u.value);st.textContent=fmt((Number(q.value)||0)*(Number(u.value)||0));}p.addEventListener('change',function(){const o=p.options[p.selectedIndex];if(!o.value)return;n.value=o.dataset.name||n.value;s.value=o.dataset.size||s.value;u.value=o.dataset.price||u.value;total();});q.addEventListener('input',total);u.addEventListener('input',total);total();})();</script>@endpush
 @endsection
