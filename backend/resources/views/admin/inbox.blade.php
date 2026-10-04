@@ -27,7 +27,7 @@
 
         <link
             rel="stylesheet"
-            href="{{ asset('css/wgp-system.css') . '?v=20261004-v5' }}"
+            href="{{ asset('css/wgp-system.css') . '?v=20261004-v6' }}"
         >
 
         <style>
@@ -41,8 +41,8 @@
                 overflow: hidden;
                 background:
                     radial-gradient(circle at 50% 38%, rgba(214, 166, 45, 0.10), transparent 34%),
-                    radial-gradient(circle at 50% 100%, rgba(18, 35, 58, 0.26), transparent 48%),
-                    linear-gradient(145deg, #091526 0%, #0b1728 52%, #12233a 100%);
+                    radial-gradient(circle at 50% 100%, rgba(214, 166, 45, 0.08), transparent 48%),
+                    linear-gradient(145deg, #08090b 0%, #0b0c0e 52%, #17181b 100%);
                 opacity: 1;
                 visibility: visible;
                 transition:
@@ -91,10 +91,10 @@
                 content: "";
                 position: absolute;
                 inset: 3px;
-                border: 2px solid rgba(212, 175, 82, 0.92);
+                border: 2px solid rgba(214, 166, 45, 0.92);
                 border-radius: 50%;
                 box-shadow:
-                    0 0 18px rgba(212, 175, 82, 0.20),
+                    0 0 18px rgba(214, 166, 45, 0.20),
                     0 0 42px rgba(214, 166, 45, 0.20);
                 animation: wgp-gold-ring 2.8s linear infinite;
             }
@@ -103,7 +103,7 @@
                 content: "";
                 position: absolute;
                 inset: 11px;
-                border: 1px solid rgba(212, 175, 82, 0.26);
+                border: 1px solid rgba(214, 166, 45, 0.26);
                 border-radius: 50%;
             }
 
@@ -117,7 +117,7 @@
                 border-radius: 50%;
                 filter:
                     drop-shadow(0 16px 30px rgba(0, 0, 0, 0.48))
-                    drop-shadow(0 0 16px rgba(212, 175, 82, 0.16));
+                    drop-shadow(0 0 16px rgba(214, 166, 45, 0.16));
                 animation: wgp-logo-breathe 1.9s ease-in-out infinite;
             }
 
@@ -149,16 +149,16 @@
                 content: "";
                 width: 56px;
                 height: 1px;
-                background: linear-gradient(90deg, transparent, #d4af52);
+                background: linear-gradient(90deg, transparent, #d6a62d);
             }
 
             .wgp-loading-subtitle::after {
-                background: linear-gradient(90deg, #d4af52, transparent);
+                background: linear-gradient(90deg, #d6a62d, transparent);
             }
 
             .wgp-loading-workspace {
                 margin: 4px 0 2px;
-                color: rgba(232, 238, 248, 0.62);
+                color: rgba(247, 248, 250, 0.62);
                 font-size: 0.68rem;
                 letter-spacing: 0.24em;
                 text-transform: uppercase;
@@ -170,11 +170,11 @@
                 height: 5px;
                 margin-top: 14px;
                 overflow: hidden;
-                border: 1px solid rgba(212, 175, 82, 0.52);
+                border: 1px solid rgba(214, 166, 45, 0.52);
                 border-radius: 999px;
                 background: rgba(0, 0, 0, 0.38);
                 box-shadow:
-                    0 0 12px rgba(212, 175, 82, 0.08),
+                    0 0 12px rgba(214, 166, 45, 0.08),
                     inset 0 1px 2px rgba(0, 0, 0, 0.45);
             }
 
@@ -183,10 +183,10 @@
                 width: 46%;
                 height: 100%;
                 border-radius: inherit;
-                background: linear-gradient(90deg, #9b6711, #ffe8a0, #d4af52);
+                background: linear-gradient(90deg, #9a7112, #f1c85b, #d6a62d);
                 box-shadow:
                     0 0 10px rgba(255, 211, 93, 0.72),
-                    0 0 24px rgba(212, 175, 82, 0.34);
+                    0 0 24px rgba(214, 166, 45, 0.34);
                 animation: wgp-loading-progress 1.35s ease-in-out infinite;
             }
 

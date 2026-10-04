@@ -3,17 +3,17 @@
  * Shared visual layer for all admin modules.
  */
 :root {
-    --wgp-bg: #f5f1e9;
-    --wgp-surface: #fffdfa;
+    --wgp-bg: #f7f8fa;
+    --wgp-surface: #ffffff;
     --wgp-surface-strong: #ffffff;
-    --wgp-ink: #1f1b17;
-    --wgp-muted: #746d63;
-    --wgp-soft: #9b9388;
-    --wgp-line: #e6ded2;
-    --wgp-line-strong: #d9cfc1;
-    --wgp-gold: #bd791f;
-    --wgp-gold-dark: #995c12;
-    --wgp-gold-soft: #f4e7d3;
+    --wgp-ink: #182235;
+    --wgp-muted: #738095;
+    --wgp-soft: #8b95a5;
+    --wgp-line: #e7ebf1;
+    --wgp-line-strong: #dce2e9;
+    --wgp-gold: #d6a62d;
+    --wgp-gold-dark: #9a7112;
+    --wgp-gold-soft: #fff5d7;
     --wgp-success: #28734a;
     --wgp-success-soft: #e8f4ec;
     --wgp-danger: #a33c32;
@@ -34,9 +34,9 @@ body.dashboard-page {
 .dashboard-shell { min-height: 100vh; }
 
 .dashboard-sidebar {
-    background: rgba(255, 253, 249, .96) !important;
+    background: #08090b !important;
     border-right: 1px solid var(--wgp-line) !important;
-    box-shadow: 8px 0 28px rgba(44, 35, 25, .025);
+    box-shadow: 8px 0 28px rgba(8, 9, 11, .12);
     flex-basis: 16.5rem !important;
     padding: 1.5rem .85rem 1rem !important;
     position: sticky;
@@ -46,7 +46,7 @@ body.dashboard-page {
 }
 
 .dashboard-logo {
-    border-bottom: 1px solid var(--wgp-line);
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
     gap: .8rem !important;
     letter-spacing: .13em !important;
     margin: 0 .35rem 1.25rem;
@@ -54,10 +54,10 @@ body.dashboard-page {
 }
 
 .dashboard-logo img {
-    background: #fff;
-    border: 1px solid #eee7dc;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.04);
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    box-shadow: none;
     height: 2.65rem !important;
     width: 3.2rem !important;
     padding: .2rem;
@@ -78,7 +78,7 @@ body.dashboard-page {
 .dashboard-nav-item {
     border: 1px solid transparent;
     border-radius: 10px !important;
-    color: #6e675e !important;
+    color: rgba(255, 255, 255, .72) !important;
     font-size: .78rem !important;
     gap: .65rem !important;
     margin: .12rem 0 !important;
@@ -87,16 +87,16 @@ body.dashboard-page {
 }
 
 .dashboard-nav-item:hover {
-    background: #f8f3eb !important;
-    border-color: #eee4d6 !important;
-    color: var(--wgp-ink) !important;
+    background: rgba(255, 255, 255, .08) !important;
+    border-color: transparent !important;
+    color: #ffffff !important;
 }
 
 .dashboard-nav-item.is-active {
-    background: var(--wgp-gold-soft) !important;
-    border-color: #ecd9bd !important;
-    color: var(--wgp-gold-dark) !important;
-    box-shadow: inset 3px 0 0 var(--wgp-gold);
+    background: var(--wgp-gold) !important;
+    border-color: var(--wgp-gold) !important;
+    color: #101114 !important;
+    box-shadow: 0 7px 18px rgba(214, 166, 45, .17);
 }
 
 .nav-icon {
@@ -107,17 +107,17 @@ body.dashboard-page {
 .nav-state { color: var(--wgp-gold-dark) !important; font-size: .54rem !important; }
 
 .dashboard-sidebar-footer {
-    background: #faf7f1;
-    border: 1px solid var(--wgp-line) !important;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12) !important;
     border-radius: 12px;
     gap: .55rem !important;
     margin: .75rem .25rem 0;
     padding: .65rem !important;
 }
-.dashboard-user-mark { background: var(--wgp-gold-soft) !important; color: var(--wgp-gold-dark) !important; }
+.dashboard-user-mark { background: var(--wgp-gold) !important; color: #101114 !important; }
 .dashboard-user-details strong { font-family: Inter, ui-sans-serif, system-ui, sans-serif !important; }
 .dashboard-signout { border-radius: 8px; }
-.dashboard-signout:hover { background: var(--wgp-gold-soft); }
+.dashboard-signout:hover { background: rgba(255, 255, 255, .08); }
 
 .dashboard-main {
     min-width: 0;
@@ -202,10 +202,10 @@ body.dashboard-page {
 .delivery-form button,
 .report-filter button,
 .dashboard-primary-action {
-    background: var(--wgp-ink) !important;
-    border-color: var(--wgp-ink) !important;
+    background: var(--wgp-gold) !important;
+    border-color: var(--wgp-gold) !important;
     border-radius: 10px !important;
-    color: #fff !important;
+    color: #101114 !important;
     font-weight: 700 !important;
     min-height: 2.65rem;
     transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
@@ -216,8 +216,9 @@ body.dashboard-page {
 .delivery-form button:hover,
 .report-filter button:hover,
 .dashboard-primary-action:hover {
-    background: #342d25 !important;
-    box-shadow: 0 8px 20px rgba(31,27,23,.12);
+    background: #f1c85b !important;
+    border-color: #f1c85b !important;
+    box-shadow: 0 8px 20px rgba(214,166,45,.2);
     transform: translateY(-1px);
 }
 
@@ -269,8 +270,8 @@ body.dashboard-page {
 .orders-table th,
 .delivery-table th,
 .report-table th {
-    background: #faf7f1 !important;
-    color: #7d756a !important;
+    background: #f7f8fa !important;
+    color: var(--wgp-muted) !important;
     font-size: .62rem !important;
     font-weight: 750 !important;
     letter-spacing: .1em !important;
@@ -285,7 +286,7 @@ body.dashboard-page {
 .delivery-table th,
 .report-table td,
 .report-table th {
-    border-bottom-color: #eee7dc !important;
+    border-bottom-color: var(--wgp-line) !important;
     padding: .9rem 1rem !important;
     vertical-align: middle;
 }
@@ -293,7 +294,7 @@ body.dashboard-page {
 .products-table tbody tr:hover,
 .orders-table tbody tr:hover,
 .delivery-table tbody tr:hover,
-.report-table tbody tr:hover { background: #fcfaf6; }
+.report-table tbody tr:hover { background: #fffdf7; }
 
 /* Forms */
 .products-page input,
@@ -330,7 +331,7 @@ body.dashboard-page {
 .settings-page select:focus,
 .settings-page textarea:focus {
     border-color: var(--wgp-gold) !important;
-    box-shadow: 0 0 0 3px rgba(189,121,31,.11) !important;
+    box-shadow: 0 0 0 3px rgba(214,166,45,.14) !important;
 }
 
 .alert-success,
@@ -355,8 +356,8 @@ body.dashboard-page {
     border-color: var(--wgp-line) !important;
     box-shadow: var(--wgp-shadow);
 }
-.dashboard-main > .space-y-6 .bg-gray-50 { background: #f8f5ef !important; }
-.dashboard-main > .space-y-6 .bg-white { background: #fffdfa !important; }
+.dashboard-main > .space-y-6 .bg-gray-50 { background: #f7f8fa !important; }
+.dashboard-main > .space-y-6 .bg-white { background: #ffffff !important; }
 
 /* Dashboard */
 .dashboard-topbar { max-width: 90rem !important; }
@@ -520,6 +521,6 @@ body.dashboard-page {
 
 /* Selection/focus */
 :focus-visible {
-    outline: 3px solid rgba(189,121,31,.22);
+    outline: 3px solid rgba(214,166,45,.32);
     outline-offset: 2px;
 }

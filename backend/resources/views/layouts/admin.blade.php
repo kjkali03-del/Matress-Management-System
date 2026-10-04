@@ -8,10 +8,10 @@
     <title>@yield('title', 'Admin | ' . $wgpBrandName)</title>
 
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin-ui.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/wgp-premium.css') . '?v=20261004-v5' }}">
-    <link rel="stylesheet" href="{{ asset('css/wgp-system.css') . '?v=20261004-v5' }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') . '?v=20261004-v6' }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-ui.css') . '?v=20261004-v6' }}">
+    <link rel="stylesheet" href="{{ asset('css/wgp-premium.css') . '?v=20261004-v6' }}">
+    <link rel="stylesheet" href="{{ asset('css/wgp-system.css') . '?v=20261004-v6' }}">
 
     @vite('resources/js/app.js')
 

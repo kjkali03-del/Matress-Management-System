@@ -139,6 +139,9 @@ Route::middleware(['auth', 'admin'])
 
         // Reports
         Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+        Route::get('/reports/export/pdf', [ReportsController::class, 'pdf'])->name('reports.export.pdf');
+        Route::get('/reports/export/excel', [ReportsController::class, 'excel'])->name('reports.export.excel');
+        Route::get('/reports/export/docx', [ReportsController::class, 'docx'])->name('reports.export.docx');
 
         // Settings
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');

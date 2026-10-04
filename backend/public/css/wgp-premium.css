@@ -1,6 +1,6 @@
 /* Wonder Godoro Point — Premium reference UI + motion layer */
 :root{
- --wgp-navy:#0b1728;--wgp-navy-2:#12233a;--wgp-gold:#d6a62d;--wgp-gold-2:#f1c85b;
+ --wgp-navy:#08090b;--wgp-navy-2:#17181b;--wgp-gold:#d6a62d;--wgp-gold-2:#f1c85b;
  --wgp-cream:#f7f8fa;--wgp-card:#fff;--wgp-text:#182235;--wgp-muted:#738095;--wgp-line:#e7ebf1;
  --wgp-green:#16a36b;--wgp-red:#df4e4e;--wgp-blue:#2f76e8;--wgp-purple:#7c59d9;
  --wgp-shadow:0 10px 35px rgba(20,34,55,.07);--wgp-radius:16px;

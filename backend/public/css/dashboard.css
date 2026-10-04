@@ -1,11 +1,11 @@
 :root {
-    --dashboard-ink: #26221c;
-    --dashboard-muted: #81786c;
-    --dashboard-line: #e4dbce;
-    --dashboard-paper: #f3efe7;
-    --dashboard-surface: #fffdf9;
-    --dashboard-accent: #bd6b1b;
-    --dashboard-accent-soft: #f3e7d7;
+    --dashboard-ink: #182235;
+    --dashboard-muted: #738095;
+    --dashboard-line: #e7ebf1;
+    --dashboard-paper: #f7f8fa;
+    --dashboard-surface: #ffffff;
+    --dashboard-accent: #d6a62d;
+    --dashboard-accent-soft: #fff5d7;
 }
 
 body.dashboard-page {
@@ -22,7 +22,7 @@ body.dashboard-page {
 }
 
 .dashboard-sidebar {
-    background: var(--dashboard-surface);
+    background: #08090b;
     border-right: 1px solid var(--dashboard-line);
     display: flex;
     flex: 0 0 16rem;
@@ -32,7 +32,7 @@ body.dashboard-page {
 
 .dashboard-logo {
     align-items: center;
-    color: var(--dashboard-ink);
+    color: #ffffff;
     display: flex;
     font: 700 .67rem Arial, sans-serif;
     gap: .75rem;
