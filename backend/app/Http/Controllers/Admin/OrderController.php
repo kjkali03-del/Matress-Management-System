@@ -105,7 +105,7 @@ class OrderController extends Controller
 
         return view('admin.orders.create', [
             'customers' => $customers,
-            'products' => Product::where('is_active', true)->orderBy('name')->orderBy('size')->get(),
+            'products' => Product::active()->with('category')->orderBy('name')->orderBy('size')->get(),
             'drivers' => User::orderBy('name')->get(),
         ]);
     }
@@ -179,7 +179,7 @@ class OrderController extends Controller
         return view('admin.orders.edit', [
             'order' => $order,
             'customers' => $customers,
-            'products' => Product::where('is_active', true)->orderBy('name')->orderBy('size')->get(),
+            'products' => Product::active()->with('category')->orderBy('name')->orderBy('size')->get(),
             'drivers' => User::orderBy('name')->get(),
         ]);
     }

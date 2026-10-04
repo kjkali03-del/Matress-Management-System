@@ -1,3 +1,5 @@
+<div class="wgp-product-persistence-note" data-wgp-reveal><strong>Product catalogue</strong><span>Products you save here are stored in the database and remain available for future orders, edits and reports.</span></div>
+
 <div class="product-form-grid">
     <div class="product-field">
         <label for="name">Product name *</label>

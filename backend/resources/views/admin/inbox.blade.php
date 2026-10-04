@@ -25,6 +25,11 @@
             href="{{ asset('css/inbox.css') }}"
         >
 
+        <link
+            rel="stylesheet"
+            href="{{ asset('css/wgp-system.css') . '?v=20261004-v5' }}"
+        >
+
         <style>
             /* Wonder Godoro Point — premium dark maroon startup screen */
             #wgp-loading-screen {
@@ -35,9 +40,9 @@
                 place-items: center;
                 overflow: hidden;
                 background:
-                    radial-gradient(circle at 50% 38%, rgba(96, 10, 18, 0.30), transparent 34%),
-                    radial-gradient(circle at 50% 100%, rgba(55, 3, 8, 0.30), transparent 48%),
-                    linear-gradient(145deg, #120003 0%, #210006 48%, #0d0002 100%);
+                    radial-gradient(circle at 50% 38%, rgba(214, 166, 45, 0.10), transparent 34%),
+                    radial-gradient(circle at 50% 100%, rgba(18, 35, 58, 0.26), transparent 48%),
+                    linear-gradient(145deg, #091526 0%, #0b1728 52%, #12233a 100%);
                 opacity: 1;
                 visibility: visible;
                 transition:
@@ -90,7 +95,7 @@
                 border-radius: 50%;
                 box-shadow:
                     0 0 18px rgba(212, 175, 82, 0.20),
-                    0 0 42px rgba(126, 7, 20, 0.26);
+                    0 0 42px rgba(214, 166, 45, 0.20);
                 animation: wgp-gold-ring 2.8s linear infinite;
             }
 
@@ -118,7 +123,7 @@
 
             .wgp-loading-brand {
                 margin: 2px 0 0;
-                color: #e9bd4e;
+                color: #f1c85b;
                 font-family: Georgia, "Times New Roman", serif;
                 font-size: clamp(1.65rem, 4vw, 2.45rem);
                 font-weight: 700;
@@ -133,7 +138,7 @@
                 align-items: center;
                 gap: 16px;
                 margin: 0;
-                color: #f3eee2;
+                color: #f7f8fa;
                 font-size: clamp(0.82rem, 2vw, 1rem);
                 font-weight: 400;
                 letter-spacing: 0.18em;
@@ -153,7 +158,7 @@
 
             .wgp-loading-workspace {
                 margin: 4px 0 2px;
-                color: rgba(246, 240, 227, 0.58);
+                color: rgba(232, 238, 248, 0.62);
                 font-size: 0.68rem;
                 letter-spacing: 0.24em;
                 text-transform: uppercase;
@@ -187,7 +192,7 @@
 
             .wgp-loading-label {
                 margin: 2px 0 0;
-                color: rgba(238, 211, 137, 0.88);
+                color: rgba(241, 200, 91, 0.88);
                 font-size: 0.68rem;
                 letter-spacing: 0.36em;
                 text-transform: uppercase;
@@ -1576,6 +1581,20 @@
                 window.setTimeout(() => {
                     splash.classList.add('is-hidden');
                 }, 4500);
+            })();
+        </script>
+
+        <script>
+            (() => {
+                const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                document.querySelectorAll('.conversation-item').forEach((el, index) => {
+                    el.style.setProperty('--wgp-row-index', reduce ? 0 : Math.min(index, 10));
+                });
+                if (!reduce) {
+                    document.querySelectorAll('.message-bubble').forEach((el, index) => {
+                        el.style.animationDelay = `${Math.min(index, 8) * 45}ms`;
+                    });
+                }
             })();
         </script>
 

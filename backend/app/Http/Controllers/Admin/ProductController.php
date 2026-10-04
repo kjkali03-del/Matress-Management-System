@@ -8,21 +8,42 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of products.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $products = Product::with('category')
-            ->latest()
-            ->paginate(15);
+        $search = trim((string) $request->input('search', ''));
+        $status = (string) $request->input('status', 'all');
 
-        return view('admin.products.index', compact('products'));
+        $products = Product::query()
+            ->with('category')
+            ->when($search !== '', function ($query) use ($search): void {
+                $term = '%' . mb_strtolower($search, 'UTF-8') . '%';
+                $query->where(function ($q) use ($term): void {
+                    $q->whereRaw('LOWER(name) LIKE ?', [$term])
+                        ->orWhereRaw("LOWER(COALESCE(sku, '')) LIKE ?", [$term])
+                        ->orWhereRaw("LOWER(COALESCE(size, '')) LIKE ?", [$term])
+                        ->orWhereHas('category', function ($categoryQuery) use ($term): void {
+                            $categoryQuery->whereRaw('LOWER(name) LIKE ?', [$term]);
+                        });
+                });
+            })
+            ->when($status === 'active', fn ($query) => $query->where('is_active', true))
+            ->when($status === 'inactive', fn ($query) => $query->where('is_active', false))
+            ->latest('created_at')
+            ->latest('id')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.products.index', compact('products', 'search', 'status'));
     }
 
     /**
@@ -40,12 +61,6 @@ class ProductController extends Controller
             $categories = ProductCategory::where('is_active', true)->orderBy('name')->get();
         }
 
-        // Keep the product form usable even when an older deployment has not run the category seeder.
-        if ($categories->isEmpty()) {
-            app(\Database\Seeders\ProductCategorySeeder::class)->run();
-            $categories = ProductCategory::where('is_active', true)->orderBy('name')->get();
-        }
-
         return view('admin.products.create', compact('categories'));
     }
 
@@ -56,15 +71,20 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         unset($data['image']);
-        if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('products', 'public');
-        }
-        $data['is_active'] = $request->boolean('is_active', true);
-        Product::create($data);
+
+        $product = DB::transaction(function () use ($request, $data): Product {
+            if ($request->hasFile('image')) {
+                $data['image_path'] = $request->file('image')->store('products', 'public');
+            }
+
+            $data['is_active'] = $request->boolean('is_active', true);
+
+            return Product::query()->create($data);
+        });
 
         return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Product created successfully.');
+            ->route('admin.products.show', $product)
+            ->with('success', 'Product created successfully and saved to the product catalogue.');
     }
 
     /**

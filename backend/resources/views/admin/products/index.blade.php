@@ -17,13 +17,29 @@
     </div>
 
     @if(session('success'))
-        <div class="alert-success">
+        <div class="alert-success wgp-product-success" data-wgp-reveal>
             {{ session('success') }}
         </div>
     @endif
 
+    <form method="GET" action="{{ route('admin.products.index') }}" class="wgp-product-toolbar" data-wgp-reveal>
+        <div class="wgp-product-search">
+            <span aria-hidden="true">⌕</span>
+            <input type="search" name="search" value="{{ $search ?? '' }}" placeholder="Search product, SKU, size or category..." aria-label="Search products">
+        </div>
+        <select name="status" aria-label="Filter products by status">
+            <option value="all" @selected(($status ?? 'all') === 'all')>All products</option>
+            <option value="active" @selected(($status ?? '') === 'active')>Active</option>
+            <option value="inactive" @selected(($status ?? '') === 'inactive')>Inactive</option>
+        </select>
+        <button type="submit" class="btn-primary">Search</button>
+        @if(($search ?? '') !== '' || ($status ?? 'all') !== 'all')
+            <a href="{{ route('admin.products.index') }}" class="wgp-product-reset">Reset</a>
+        @endif
+    </form>
+
     @if($products->count())
-        <div class="products-card">
+        <div class="products-card" data-wgp-reveal>
             <div class="table-wrapper">
                 <table class="products-table">
                     <thead>
@@ -40,7 +56,7 @@
 
                     <tbody>
                         @foreach($products as $product)
-                            <tr>
+                            <tr data-wgp-reveal>
                                 <td>
                                     <div class="wgp-product-listing">
                                         @if($product->image_path)<img src="{{ asset('storage/'.$product->image_path) }}" alt="{{ $product->name }}">@else<div class="wgp-product-listing-placeholder">▣</div>@endif

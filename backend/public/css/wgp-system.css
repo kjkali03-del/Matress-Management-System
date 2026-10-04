@@ -1,0 +1,8 @@
+/* Wonder Godoro Point — V5 System Design Tokens */
+:root{--wgp-navy:#0b1728;--wgp-navy-2:#12233a;--wgp-gold:#d6a62d;--wgp-gold-2:#f1c85b;--wgp-bg:#f7f8fa;--wgp-surface:#fff;--wgp-text:#182235;--wgp-muted:#738095;--wgp-line:#e7ebf1;--wgp-success:#16a36b;--wgp-danger:#df4e4e;--wgp-shadow:0 10px 35px rgba(20,34,55,.07);--wgp-radius:14px}
+.btn-primary,.order-btn-primary,.product-btn-primary,.auth-submit{background:linear-gradient(135deg,var(--wgp-gold),var(--wgp-gold-2))!important;border-color:var(--wgp-gold)!important;color:#101827!important;box-shadow:0 8px 20px rgba(214,166,45,.16)}
+.btn-primary:hover,.order-btn-primary:hover,.product-btn-primary:hover,.auth-submit:hover{background:var(--wgp-gold-2)!important;transform:translateY(-2px)}
+[data-wgp-reveal],.wgp-reveal{opacity:0;transform:translateY(14px);transition:opacity .55s cubic-bezier(.2,.8,.2,1),transform .55s cubic-bezier(.2,.8,.2,1)}
+[data-wgp-reveal].wgp-visible,.wgp-reveal.wgp-visible{opacity:1;transform:none}
+.wgp-navigating{animation:wgp-nav-exit .18s ease both}@keyframes wgp-nav-exit{from{opacity:1}to{opacity:.75}}
+@media(prefers-reduced-motion:reduce){[data-wgp-reveal],.wgp-reveal{opacity:1!important;transform:none!important;transition:none!important}.wgp-navigating{animation:none!important}}

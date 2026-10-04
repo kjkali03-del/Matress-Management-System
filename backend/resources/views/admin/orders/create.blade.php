@@ -115,8 +115,8 @@
                     <select id="product_id" name="product_id">
                         <option value="">Manual product entry</option>
                         @foreach($products as $product)
-                            <option value="{{ $product->id }}" @selected(old('product_id', $order->product_id ?? '') == $product->id)>
-                                {{ $product->name }}{{ $product->size ? ' — '.$product->size : '' }} — TSh {{ number_format($product->price,0) }}
+                            <option value="{{ $product->id }}" data-name="{{ e($product->name) }}" data-size="{{ e($product->size) }}" data-price="{{ $product->price }}" data-stock="{{ $product->stock_quantity }}" @selected(old('product_id', $order->product_id ?? '') == $product->id)>
+                                {{ $product->name }}{{ $product->size ? ' — '.$product->size : '' }} — TSh {{ number_format($product->price,0) }} · Stock {{ $product->stock_quantity }}
                             </option>
                         @endforeach
                     </select>
@@ -261,4 +261,12 @@
     </div>
 
 </div>
+<script>
+(() => {
+    const catalog=document.getElementById('product_id'), name=document.getElementById('product_name'), size=document.getElementById('product_size'), price=document.getElementById('unit_price');
+    if(!catalog) return;
+    const sync=()=>{const option=catalog.options[catalog.selectedIndex]; if(!option||!option.value)return; if(option.dataset.name)name.value=option.dataset.name; if(option.dataset.size!==undefined)size.value=option.dataset.size; if(option.dataset.price)price.value=Number(option.dataset.price).toFixed(0); [name,size,price].forEach((el,i)=>el.animate([{transform:'translateY(4px)',opacity:.55},{transform:'none',opacity:1}],{duration:220,delay:i*25,easing:'cubic-bezier(.2,.8,.2,1)'}));};
+    catalog.addEventListener('change',sync); if(catalog.value)sync();
+})();
+</script>
 @endsection
