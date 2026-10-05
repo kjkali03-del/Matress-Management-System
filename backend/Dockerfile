@@ -31,7 +31,7 @@ RUN apt-get update \
         libzip-dev \
     && docker-php-ext-configure intl \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install -j"$(nproc)" bcmath intl mbstring opcache pdo_pgsql zip \
+    && docker-php-ext-install -j"$(nproc)" bcmath intl mbstring opcache pcntl pdo_pgsql zip \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
