@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -266,6 +267,57 @@ class AiAgentTest extends TestCase
             'conversation_id' => $conversation->id,
             'direction' => 'outbound',
             'body' => 'Our mattress is TSh 10,000.',
+        ]);
+    }
+
+    public function test_failure_diagnostic_sanitizes_exception_details_without_interrupting_fallback(): void
+    {
+        $this->enableAgent();
+        config(['ai.api_key' => 'test-provider-secret']);
+
+        $conversation = Conversation::factory()->create();
+        $message = Message::factory()->for($conversation)->create([
+            'body' => 'Nataka kununua godoro.',
+        ]);
+        $exception = new \RuntimeException('Provider rejected credential test-provider-secret');
+        $loggedContext = null;
+
+        $provider = \Mockery::mock(AiProviderInterface::class);
+        $provider->shouldReceive('isConfigured')->once()->andReturn(true);
+        $provider->shouldReceive('complete')->once()->andThrow($exception);
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('WGP AI turn failed.', \Mockery::on(
+                static function (array $context) use (&$loggedContext): bool {
+                    $loggedContext = $context;
+
+                    return true;
+                },
+            ));
+
+        (new AiAgentOrchestrator(
+            $provider,
+            app(AiBusinessTools::class),
+            app(ConversationMessageService::class),
+        ))->handle($message);
+
+        $this->assertSame(\RuntimeException::class, $loggedContext['exception_class']);
+        $this->assertSame('RuntimeException', $loggedContext['exception_type']);
+        $this->assertSame('Provider rejected credential [REDACTED]', $loggedContext['exception_message']);
+        $this->assertSame($exception->getFile(), $loggedContext['exception_file']);
+        $this->assertSame($exception->getLine(), $loggedContext['exception_line']);
+        $this->assertNotSame('', $loggedContext['exception_trace']);
+        $this->assertStringNotContainsString('test-provider-secret', $loggedContext['exception_message']);
+        $this->assertStringNotContainsString('test-provider-secret', $loggedContext['exception_trace']);
+
+        $this->assertDatabaseHas('ai_conversation_states', [
+            'conversation_id' => $conversation->id,
+            'status' => 'escalated',
+        ]);
+        $this->assertDatabaseHas('ai_actions', [
+            'conversation_id' => $conversation->id,
+            'tool' => 'ai_failure_fallback',
+            'status' => 'completed',
         ]);
     }
 

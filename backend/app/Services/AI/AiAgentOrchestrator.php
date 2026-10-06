@@ -681,7 +681,8 @@ class AiAgentOrchestrator
         ) ?? $diagnostic;
 
         $secrets = [];
-        array_walk_recursive(config()->all(), static function ($value, $key) use (&$secrets): void {
+        $configuration = config()->all();
+        array_walk_recursive($configuration, static function ($value, $key) use (&$secrets): void {
             if (
                 is_string($value)
                 && $value !== ''
@@ -692,6 +693,8 @@ class AiAgentOrchestrator
             }
         });
 
-        return str_replace(array_unique($secrets), '[REDACTED]', $diagnostic);
+        $secrets = array_unique($secrets);
+
+        return str_replace($secrets, '[REDACTED]', $diagnostic);
     }
 }
