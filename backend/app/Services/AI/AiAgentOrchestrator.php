@@ -274,6 +274,11 @@ class AiAgentOrchestrator
                 'conversation_id' => $conversation->id,
                 'message_id' => $inbound->id,
                 'exception_type' => class_basename($exception),
+                'exception_class' => get_class($exception),
+                'exception_message' => $this->sanitizeExceptionDiagnostic($exception->getMessage()),
+                'exception_file' => $this->sanitizeExceptionDiagnostic($exception->getFile()),
+                'exception_line' => $exception->getLine(),
+                'exception_trace' => $this->sanitizeExceptionDiagnostic($exception->getTraceAsString()),
             ]);
 
             $this->escalateFailure(
@@ -660,5 +665,33 @@ class AiAgentOrchestrator
     private function isExplicitRejection(string $body): bool
     {
         return preg_match('/^\s*(hapana|no|cancel|sitaki|acha|badili|change it|not now)\s*[.!]*\s*$/iu', $body) === 1;
+    }
+
+    private function sanitizeExceptionDiagnostic(string $diagnostic): string
+    {
+        $diagnostic = preg_replace(
+            '~\b(Bearer\s+)[^\s,"\']+~i',
+            '$1[REDACTED]',
+            $diagnostic,
+        ) ?? $diagnostic;
+        $diagnostic = preg_replace(
+            '~\b((?:api[_-]?key|access[_-]?token|refresh[_-]?token|authorization|password|passwd|secret|credential)\b\s*["\']?\s*[:=]\s*["\']?)[^"\'\s,;&]+~i',
+            '$1[REDACTED]',
+            $diagnostic,
+        ) ?? $diagnostic;
+
+        $secrets = [];
+        array_walk_recursive(config()->all(), static function ($value, $key) use (&$secrets): void {
+            if (
+                is_string($value)
+                && $value !== ''
+                && is_string($key)
+                && preg_match('/key|token|secret|password|credential|authorization/i', $key) === 1
+            ) {
+                $secrets[] = $value;
+            }
+        });
+
+        return str_replace(array_unique($secrets), '[REDACTED]', $diagnostic);
     }
 }
