@@ -38,6 +38,7 @@ WORKDIR /var/www/html
 
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 COPY --from=assets /app/public/build ./public/build
 COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
